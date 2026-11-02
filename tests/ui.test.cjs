@@ -6,7 +6,7 @@ const vm=require('node:vm');
 const path=require('node:path');
 const html=fs.readFileSync(path.join(__dirname,'../index.html'),'utf8');
 const source=html.match(/<script id="landfall-code">([\s\S]*?)<\/script>/)[1];
-function fixture(){
+function fixture(options={}){
  let clock=1000,pendingFrame;const elements=new Map(),docListeners=new Map(),winListeners=new Map();
  const doc={activeElement:null,hidden:false,fullscreenElement:null,addEventListener:(k,f)=>docListeners.set(k,f)};
  function element(id,tag='BUTTON'){
@@ -28,9 +28,9 @@ function fixture(){
  doc.getElementById=id=>elements.get(id);doc.querySelector=()=>modes.find(e=>e.checked);
  doc.querySelectorAll=q=>q==='.mission-card'?cards:q==='[data-key]'?touch:modes;
  const store=new Map();const storage={getItem:k=>store.get(k)||null,setItem:(k,v)=>store.set(k,v)};
- const win={matchMedia:()=>({matches:false}),addEventListener:(k,f)=>winListeners.set(k,f)};
+ const win={matchMedia:()=>({matches:false}),addEventListener:(k,f)=>winListeners.set(k,f),AudioContext:options.AudioContext};
  const sandbox={document:doc,window:win,localStorage:storage,performance:{now:()=>clock},requestAnimationFrame:f=>{pendingFrame=f;},Float32Array,Math};
- const code=source.replace('showMenu();requestAnimationFrame(frame);','showMenu();requestAnimationFrame(frame);globalThis.testApi={get game(){return game;},input,syncStatus,mouse};');
+ const code=source.replace('showMenu();requestAnimationFrame(frame);','showMenu();requestAnimationFrame(frame);globalThis.testApi={get game(){return game;},input,syncStatus,mouse,sound};');
  vm.runInNewContext(code,sandbox,{filename:'index.html browser handlers'});
  const api=sandbox.testApi;
  const click=(id,detail=1)=>{const el=elements.get(id);el.focus();return el.emit('click',{detail});};
@@ -78,4 +78,62 @@ test('campaign completion offers the bonus menu without appending bonus stages',
 test('both bonus views render and naval keyboard bearing takes over from mouse aim',()=>{
  for(const stage of [4,5]){const f=fixture();f.start(stage);f.render();f.tick(16);f.render();}
  const f=fixture();f.start(5);f.canvas.emit('pointermove',{pointerType:'mouse',clientX:120,clientY:90});assert.equal(f.api.input().aim.x,120);f.key('KeyD');assert.equal(f.api.input().aim,null);assert.equal(f.api.input().dx,1);
+});
+test('mouse aiming at visible naval hulls damages and sinks every ship in either mode',()=>{
+ for(const mode of ['easy','hard']){
+  const f=fixture();f.start(5,mode);f.key('KeyE');const g=f.api.game;
+  for(const target of g.enemies){
+   const pointer={pointerId:9,pointerType:'mouse',clientX:target.x,clientY:target.y+2};
+   f.canvas.emit('pointermove',pointer);f.canvas.emit('pointerdown',pointer);
+   for(let i=0;i<Math.ceil(8/(1/120))&&!target.dead&&g.status==='play';i++)g.update(1/120,f.api.input());
+   f.canvas.emit('pointerup',pointer);assert.ok(target.dead,`${mode}: aim and click must sink the visible ship at ${target.x}; hp=${target.hp}, report=${g.feedback}`);
+  }
+  assert.equal(g.status,'clear');assert.equal(g.shipsDown,g.enemies.length);
+ }
+});
+test('naval mouse aiming accepts the mast and hull edge and keeps keyboard elevation corrections',()=>{
+ const f=fixture();f.start(5);const g=f.api.game,target=g.enemies[0],scale=.65+(9000-target.range)/15000;
+ f.canvas.emit('pointermove',{pointerType:'mouse',clientX:target.x+26*scale,clientY:target.y+2});assert.equal(g.bearing,target.x);assert.equal(g.elevation,target.range/200);
+ f.canvas.emit('pointermove',{pointerType:'mouse',clientX:target.x,clientY:target.y-20*scale});assert.equal(g.elevation,target.range/200);
+ const elevation=g.elevation;f.key('KeyW');g.update(.05,f.api.input());assert.ok(g.elevation>elevation);
+});
+test('mouse and touch naval salvos retain their fired solution when the pointer moves',()=>{
+ for(const pointerType of ['mouse','touch']){
+  const f=fixture();f.start(5);const g=f.api.game,[first,second]=g.enemies;
+  const point={pointerId:17,pointerType,clientX:first.x,clientY:first.y+2};f.canvas.emit('pointerdown',point);g.update(1/120,f.api.input());
+  f.canvas.emit('pointermove',{...point,clientX:second.x,clientY:second.y+2});f.canvas.emit('pointerup',point);
+  for(let i=0;i<130;i++)g.update(1/120,f.api.input());
+  assert.equal(first.hp,1);assert.equal(second.hp,2);assert.equal(g.elevation,second.range/200);
+ }
+});
+function audioFixture(){
+ const sources=[],contexts=[];
+ const parameter=()=>({value:0,setTargetAtTime(v){this.value=v;},setValueAtTime(v){this.value=v;},exponentialRampToValueAtTime(){}});
+ class Context{
+  constructor(){this.currentTime=0;this.state='running';this.destination={};contexts.push(this);}
+  createGain(){return {gain:parameter(),connect(){},disconnect(){}};}
+  createBuffer(_,length,rate){return {length,duration:length/rate,sampleRate:rate,data:new Float32Array(length),copyToChannel(data){this.data.set(data);}};}
+  createBufferSource(){const source={loop:false,ended:false,connect(){},disconnect(){},start(){this.started=true;},end(){if(!this.ended){this.ended=true;this.onended?.();}},stop(){this.stopped=true;this.end();}};sources.push(source);return source;}
+ }
+ const f=fixture({AudioContext:Context});f.api.sound.unlock();
+ return {...f,sources,context:contexts[0],voiceSources:()=>sources.filter(s=>s.started&&!s.loop),endVoice(){const s=f.api.sound.activeVoice?.source;if(s){contexts[0].currentTime+=s.buffer.duration+.2;s.end();}}};
+}
+test('enemy hit playback cycles both new phrases and the old cry without stacking voices',()=>{
+ const f=audioFixture(),sound=f.api.sound;
+ for(const line of ['allons-y','ow','ahh']){
+  sound.event({type:'hitEnemy'});assert.equal(sound.activeVoice.line,line);assert.equal(sound.nodes,1);const count=f.voiceSources().length;
+  sound.event({type:'voice',team:'enemy'});assert.equal(f.voiceSources().length,count);assert.equal(sound.nodes,1);f.endVoice();assert.equal(sound.nodes,0);
+ }
+ assert.equal(sound.cache.size,3);
+});
+test('both menu previews are playable, use separate cached buffers and do not consume the hit cycle',()=>{
+ const f=audioFixture(),sound=f.api.sound;f.click('previewAllons');const first=sound.activeVoice.source;assert.equal(sound.activeVoice.line,'allons-y');
+ f.click('previewOw');assert.ok(first.stopped);assert.equal(sound.activeVoice.line,'ow');assert.notEqual(first.buffer,sound.activeVoice.source.buffer);assert.equal(sound.enemyVoiceIndex,0);assert.equal(sound.nodes,1);
+ f.click('previewAllons');assert.equal(sound.activeVoice.source.buffer,first.buffer);
+});
+test('mute, voice disable and pause stop speech; ally death can interrupt an enemy line',()=>{
+ const f=audioFixture(),sound=f.api.sound;f.click('previewOw');const enemy=sound.activeVoice.source;sound.event({type:'voice',team:'ally'});assert.ok(enemy.stopped);assert.equal(sound.activeVoice.team,'ally');assert.equal(sound.activeVoice.line,'ahh');
+ f.elements.get('voiceToggle').checked=false;f.elements.get('voiceToggle').emit('change');assert.equal(sound.activeVoice,null);assert.ok(f.elements.get('previewAllons').disabled);const count=f.voiceSources().length;sound.event({type:'hitEnemy'});assert.equal(f.voiceSources().length,count);
+ f.elements.get('voiceToggle').checked=true;f.elements.get('voiceToggle').emit('change');f.click('previewAllons');f.click('soundButton');assert.equal(sound.activeVoice,null);assert.ok(f.elements.get('previewOw').disabled);
+ f.click('soundButton');f.click('previewOw');sound.paused=true;sound.sync();assert.equal(sound.activeVoice,null);assert.equal(sound.nodes,0);
 });

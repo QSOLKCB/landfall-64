@@ -37,7 +37,7 @@ Both bonus games are available directly from the menu, in either difficulty. The
 | Bonus | Mechanics | Controls |
 | --- | --- | --- |
 | **B1 · Skyshield** | Defend the fleet with shipboard anti-aircraft guns. Lead approaching planes, intercept falling bombs and catch scout aircraft for extra points. Six ready shells replenish continuously, encouraging short bursts. Survive the complete raid. | Mouse or WASD/arrows aim; click/Space fires; `E` deploys a flak barrage and reloads the ready shells. |
-| **B2 · Iron Horizon** | Sink the opposing fleet with heavy naval guns. Align a ship, fire a ranging salvo, then correct elevation using LONG/SHORT splash reports. One degree adds 200m of arcade range. Incoming salvos are telegraphed; smoke disrupts them. | Mouse or A/D sets bearing; W/S sets elevation; Shift gives fine elevation control; click/Space fires; `E` lays smoke. A slider also controls elevation with mouse or touch. |
+| **B2 · Iron Horizon** | Sink the opposing fleet with heavy naval guns. Mouse/touch aiming at a visible hull or mast sets bearing and range together. Manual ranging uses LONG/SHORT splash reports; one degree adds 200m of arcade range. Incoming salvos are telegraphed; smoke disrupts them. | Mouse/touch aims both axes; A/D sets bearing; W/S sets elevation; Shift gives fine elevation control; click/Space fires; `E` lays smoke. A slider also controls elevation. |
 
 The bonus mechanics reference the anti-aircraft and ranging-gun sequences in the [1983 Beach-Head manual](https://www.mocagh.org/miscgame/beachhead-manual.pdf). Skyshield and Iron Horizon have original names, artwork, layouts, code and synthesized sound.
 
@@ -78,7 +78,7 @@ Both modes checkpoint at stage entry. Retrying restores that stage's starting sc
 - Seeded encounter generation, deterministic physics and replayable input.
 - Original sprite geometry, landscapes, layouts and interface drawn in code.
 - Original looping mathematical pulse synthesized from waves, integer operations and seeded noise; no recorded soundtrack or borrowed melody.
-- New digitized “ahhh” cries generated with harmonic formants, a falling fundamental and quantization. Allies, enemies and the commander have different timbres. No recordings, speech service or browser voice downloads.
+- Digitized enemy hit voices cycle between a brisk **“Allons-y!”**, a long falling **“Owwww…”**, and the original **“ahhh”**. Phoneme formants, nasal resonance, fricative noise, pitch glides and sample quantization generate them entirely in code. Ally and commander death cries retain their own timbres. Try the two preview buttons in Mission Control. Voices play one at a time; mute, pause and the Voices checkbox stop speech immediately. No recordings, speech service or browser voice downloads.
 - Grace periods after damage, clear attack warnings, independent audio controls, reduced-motion support and pause on loss of focus.
 
 The game draws inspiration from the multi-stage arcade rescue genre. Its characters, story, artwork, level layouts, audio and code are original. See [ASSETS.md](ASSETS.md).
