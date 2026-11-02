@@ -79,6 +79,33 @@ test('both bonus views render and naval keyboard bearing takes over from mouse a
  for(const stage of [4,5]){const f=fixture();f.start(stage);f.render();f.tick(16);f.render();}
  const f=fixture();f.start(5);f.canvas.emit('pointermove',{pointerType:'mouse',clientX:120,clientY:90});assert.equal(f.api.input().aim.x,120);f.key('KeyD');assert.equal(f.api.input().aim,null);assert.equal(f.api.input().dx,1);
 });
+test('mouse aiming at visible naval hulls damages and sinks every ship in either mode',()=>{
+ for(const mode of ['easy','hard']){
+  const f=fixture();f.start(5,mode);f.key('KeyE');const g=f.api.game;
+  for(const target of g.enemies){
+   const pointer={pointerId:9,pointerType:'mouse',clientX:target.x,clientY:target.y+2};
+   f.canvas.emit('pointermove',pointer);f.canvas.emit('pointerdown',pointer);
+   for(let i=0;i<Math.ceil(8/(1/120))&&!target.dead&&g.status==='play';i++)g.update(1/120,f.api.input());
+   f.canvas.emit('pointerup',pointer);assert.ok(target.dead,`${mode}: aim and click must sink the visible ship at ${target.x}; hp=${target.hp}, report=${g.feedback}`);
+  }
+  assert.equal(g.status,'clear');assert.equal(g.shipsDown,g.enemies.length);
+ }
+});
+test('naval mouse aiming accepts the mast and hull edge and keeps keyboard elevation corrections',()=>{
+ const f=fixture();f.start(5);const g=f.api.game,target=g.enemies[0],scale=.65+(9000-target.range)/15000;
+ f.canvas.emit('pointermove',{pointerType:'mouse',clientX:target.x+26*scale,clientY:target.y+2});assert.equal(g.bearing,target.x);assert.equal(g.elevation,target.range/200);
+ f.canvas.emit('pointermove',{pointerType:'mouse',clientX:target.x,clientY:target.y-20*scale});assert.equal(g.elevation,target.range/200);
+ const elevation=g.elevation;f.key('KeyW');g.update(.05,f.api.input());assert.ok(g.elevation>elevation);
+});
+test('mouse and touch naval salvos retain their fired solution when the pointer moves',()=>{
+ for(const pointerType of ['mouse','touch']){
+  const f=fixture();f.start(5);const g=f.api.game,[first,second]=g.enemies;
+  const point={pointerId:17,pointerType,clientX:first.x,clientY:first.y+2};f.canvas.emit('pointerdown',point);g.update(1/120,f.api.input());
+  f.canvas.emit('pointermove',{...point,clientX:second.x,clientY:second.y+2});f.canvas.emit('pointerup',point);
+  for(let i=0;i<130;i++)g.update(1/120,f.api.input());
+  assert.equal(first.hp,1);assert.equal(second.hp,2);assert.equal(g.elevation,second.range/200);
+ }
+});
 function audioFixture(){
  const sources=[],contexts=[];
  const parameter=()=>({value:0,setTargetAtTime(v){this.value=v;},setValueAtTime(v){this.value=v;},exponentialRampToValueAtTime(){}});

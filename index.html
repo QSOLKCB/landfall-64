@@ -62,10 +62,12 @@ const MISSIONS=[
  {name:'Helicopter escape',tag:'03 / RIDE THE SKYBRIDGE',text:'Land or hover over both amber pads to collect the crew, then return to the offshore carrier.',keys:'<b>WASD / arrows</b> fly · <b>S / Down</b> land<br><b>Mouse</b> aim · <b>Click / Space</b> fire<br><b>E</b> defensive flare · <b>P</b> pause',hint:'Follow the amber pad arrows. Hold S / Down to land, then stop moving to board the crew. The cyan carrier is home.',special:'FLARE'},
  {name:'Last light duel',tag:'04 / THE LAST WORD',text:'Defeat the fortress commander. Throw between guards; jump low shots and duck high shots.',keys:'<b>A / D</b> move · <b>W</b> jump · <b>S</b> duck<br><b>Click / Space</b> throw<br><b>E</b> shield · <b>P</b> pause',hint:'Watch the warning: LOW means jump, HIGH means duck. The commander cannot block while recovering.',special:'SHIELD'},
  {name:'Skyshield',tag:'B1 / FLEET AIR DEFENCE',text:'Man the deck guns, lead incoming aircraft and protect the fleet until the raid ends.',keys:'<b>Mouse / WASD / arrows</b> aim<br><b>Click / Space</b> fire · six ready shells<br><b>E</b> flak barrage · <b>P</b> pause',hint:'Lead the planes. Use short bursts; shells refill automatically. Shoot falling bombs. Scouts earn extra points.',special:'BARRAGE'},
- {name:'Iron horizon',tag:'B2 / NAVAL RANGE DUEL',text:'Align the heavy guns with a ship, set the elevation, and use LONG / SHORT reports to find its range.',keys:'<b>Mouse / A D</b> bearing<br><b>W / S</b> elevation · <b>Shift</b> fine aim<br><b>Click / Space</b> fire · <b>E</b> smoke',hint:'SHORT: raise elevation. LONG: lower it. One degree = 200m. The slider supports mouse and touch. Use smoke against incoming salvos.',special:'SMOKE'}
+ {name:'Iron horizon',tag:'B2 / NAVAL RANGE DUEL',text:'Aim at a ship and sink the fleet. W/S or the slider adjusts elevation for manual ranging.',keys:'<b>Mouse / touch</b> aim · <b>A D</b> bearing<br><b>W / S</b> elevation · <b>Shift</b> fine aim<br><b>Click / Space</b> fire · <b>E</b> smoke',hint:'Point at a hull or mast for a firing solution. SHORT: raise; LONG: lower. One degree = 200m. Use smoke against incoming salvos.',special:'SMOKE'}
 ];
 const WALLS=[{x:55,y:173,w:86,h:8},{x:204,y:173,w:60,h:8},{x:337,y:173,w:84,h:8},{x:107,y:111,w:81,h:8},{x:292,y:111,w:82,h:8}];
 const SPIRES=[{x:478,y:149,w:36,h:81},{x:1005,y:157,w:34,h:73},{x:1516,y:132,w:40,h:98}];
+const navalShipScale=e=>.65+(9000-e.range)/15000;
+function navalShipBounds(e){const scale=navalShipScale(e);return {x:e.x-28*scale-1,y:e.y-23*scale-1,w:56*scale+2,h:31*scale+2};}
 // Return the first contact along a projectile's travelled segment, including its start.
 function segmentBoxHit(s,r){
  const dx=s.x-s.px,dy=s.y-s.py;let near=0,far=1;
@@ -275,6 +277,13 @@ class Game{
   if(this.status==='play'&&input.fire&&this.cooldown<=0&&this.rounds>=1){const t=this.target(input);this.rounds-=1;this.cooldown=.15;this.shoot(240,235,t.x,t.y,'player',360);this.event('shot');}
   if(this.spawned===this.raidTotal&&!this.enemies.length&&!this.hazards.length)this.finish();
  }
+ aimHorizon(x,y){
+  if(this.stage!==5||this.status!=='play')return;
+  this.bearing=clamp(x,20,460);if(y<87||y>211)return;
+  const target=this.enemies.find(e=>!e.dead&&inside({x,y},navalShipBounds(e)));
+  if(target){this.bearing=target.x;this.elevation=target.range/200;}
+  else this.elevation=clamp((9000-(y-110)*100)/200,5,50);
+ }
  horizon(dt,input){
   this.bearing=clamp(input.aim?input.aim.x:this.bearing+(input.dx||0)*90*dt,20,460);
   this.elevation=clamp(this.elevation-(input.dy||0)*(input.cover?1:7)*dt,5,50);
@@ -447,7 +456,7 @@ function drawSkyshield(g){
 }
 function drawHorizon(g){
  fleetSea(g);
- for(let i=0;i<g.enemies.length;i++){const e=g.enemies[i];if(e.dead){rect(e.x-12,e.y+2,24,2,'shadow');continue;}const scale=.65+(9000-e.range)/15000;ctx.save();ctx.translate(Math.round(e.x),Math.round(e.y));ctx.scale(scale,scale);
+ for(let i=0;i<g.enemies.length;i++){const e=g.enemies[i];if(e.dead){rect(e.x-12,e.y+2,24,2,'shadow');continue;}const scale=navalShipScale(e);ctx.save();ctx.translate(Math.round(e.x),Math.round(e.y));ctx.scale(scale,scale);
   poly([[-28,0],[28,0],[21,8],[-21,8]],'shadow');rect(-18,-6,35,7,'wall');rect(-6,-15,12,10,'red');rect(-2,-23,2,10,'ink');rect(0,-23,10,5,'red');rect(-20,-10,12,3,'muted');rect(11,-9,13,3,'muted');ctx.restore();
   rect(e.x-17,e.y+12,34,2,'shadow');rect(e.x-17,e.y+12,34*e.hp/e.max,2,'red');text(`HULL ${i+1}`,e.x,e.y+21,'muted',5,'center');if(e.timer<1)text('SALVO!',e.x,e.y-30,'red',5,'center');
  }
@@ -509,7 +518,7 @@ function deploy(){sound.unlock();const stage=Number($('stageSelect').value);prac
 function focusGame(){if(game?.status==='play')canvas.focus({preventScroll:true});}
 function pause(){if(!game)return;if(game.status==='play')game.status='paused';else if(game.status==='paused')game.status='play';syncStatus();focusGame();}
 function primaryAction(e){if(!game||e?.detail>1||performance.now()-lastPrimaryAction<300)return;lastPrimaryAction=performance.now();sound.unlock();if(game.status==='brief')game.begin();else if(game.status==='paused')game.status='play';else if(game.status==='failed'){if(!game.retry())deploy();}else if(game.status==='clear')game.advance();else if(game.status==='won'){deploy();}syncStatus();canvas.focus({preventScroll:true});}
-function updatePointer(e){if(e.pointerType==='touch'&&mouse.down&&mouse.pointerId!==e.pointerId)return;const r=canvas.getBoundingClientRect();mouse.x=clamp((e.clientX-r.left)/r.width*W,0,W);mouse.y=clamp((e.clientY-r.top)/r.height*H,0,H);mouse.active=e.pointerType!=='touch'||((game?.stage===1||game?.stage===4)&&mouse.down&&mouse.pointerId===e.pointerId);}
+function updatePointer(e){if(e.pointerType==='touch'&&mouse.down&&mouse.pointerId!==e.pointerId)return;const r=canvas.getBoundingClientRect();mouse.x=clamp((e.clientX-r.left)/r.width*W,0,W);mouse.y=clamp((e.clientY-r.top)/r.height*H,0,H);mouse.active=e.pointerType!=='touch'||((game?.stage===1||game?.stage===4||game?.stage===5)&&mouse.down&&mouse.pointerId===e.pointerId);if(game?.stage===5&&game.status==='play'&&mouse.active){game.aimHorizon(mouse.x,mouse.y);mouse.x=game.bearing;}}
 function releasePointer(e){if(mouse.pointerId!==e.pointerId)return;if(mouse.pointerType==='touch')mouse.active=false;mouse.down=false;mouse.pointerId=null;mouse.pointerType=null;}
 canvas.addEventListener('pointermove',updatePointer);canvas.addEventListener('pointerdown',e=>{if(e.button!==0||mouse.down)return;e.preventDefault();sound.unlock();canvas.focus({preventScroll:true});if(game&&game.status==='play'){mouse.down=true;mouse.pointerId=e.pointerId;mouse.pointerType=e.pointerType;canvas.setPointerCapture(e.pointerId);}updatePointer(e);});
 for(const type of ['pointerup','pointercancel','lostpointercapture'])canvas.addEventListener(type,releasePointer);canvas.addEventListener('pointerleave',()=>{if(!mouse.down)mouse.active=false;});canvas.addEventListener('contextmenu',e=>e.preventDefault());

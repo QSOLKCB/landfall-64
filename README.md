@@ -37,7 +37,7 @@ Both bonus games are available directly from the menu, in either difficulty. The
 | Bonus | Mechanics | Controls |
 | --- | --- | --- |
 | **B1 · Skyshield** | Defend the fleet with shipboard anti-aircraft guns. Lead approaching planes, intercept falling bombs and catch scout aircraft for extra points. Six ready shells replenish continuously, encouraging short bursts. Survive the complete raid. | Mouse or WASD/arrows aim; click/Space fires; `E` deploys a flak barrage and reloads the ready shells. |
-| **B2 · Iron Horizon** | Sink the opposing fleet with heavy naval guns. Align a ship, fire a ranging salvo, then correct elevation using LONG/SHORT splash reports. One degree adds 200m of arcade range. Incoming salvos are telegraphed; smoke disrupts them. | Mouse or A/D sets bearing; W/S sets elevation; Shift gives fine elevation control; click/Space fires; `E` lays smoke. A slider also controls elevation with mouse or touch. |
+| **B2 · Iron Horizon** | Sink the opposing fleet with heavy naval guns. Mouse/touch aiming at a visible hull or mast sets bearing and range together. Manual ranging uses LONG/SHORT splash reports; one degree adds 200m of arcade range. Incoming salvos are telegraphed; smoke disrupts them. | Mouse/touch aims both axes; A/D sets bearing; W/S sets elevation; Shift gives fine elevation control; click/Space fires; `E` lays smoke. A slider also controls elevation. |
 
 The bonus mechanics reference the anti-aircraft and ranging-gun sequences in the [1983 Beach-Head manual](https://www.mocagh.org/miscgame/beachhead-manual.pdf). Skyshield and Iron Horizon have original names, artwork, layouts, code and synthesized sound.
 
