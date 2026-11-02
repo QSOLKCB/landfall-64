@@ -32,8 +32,8 @@ test('damage grace prevents many projectiles taking all armour in one frame',()=
  const g=new Game();g.begin();g.invulnerable=0;for(let i=0;i<20;i++)g.damage();assert.equal(g.hp,7);assert.equal(g.status,'play');
 });
 test('sandbags block motion and both teams of bullets',()=>{
- const g=new Game();g.begin();g.player={x:240,y:188};run(g,.4,()=>({dy:-1}));assert.ok(g.player.y>185);
- g.shots=[{x:240,y:190,vx:0,vy:-200,gravity:0,life:2,team:'player'}];run(g,.2);assert.equal(g.shots.length,0);
+ const g=new Game();g.begin();g.player={x:240,y:188};run(g,.4,()=>({dy:-1}));assert.ok(g.player.y>=185);
+ for(const team of ['player','enemy']){g.shots=[{x:240,y:190,vx:0,vy:-200,gravity:0,life:2,team}];run(g,.2);assert.equal(g.shots.length,0);}
 });
 test('all three sentries must fall before bunker damage and gate exit',()=>{
  const g=new Game();g.begin();const b=g.enemies[3],hp=b.hp;g.player={x:240,y:45};g.shoot(240,50,240,34,'player',200);run(g,.03);assert.equal(b.hp,hp);
@@ -126,6 +126,48 @@ test('landing protection applies only to actual pads and the carrier',()=>{
 });
 test('rock spires cause damage and reject crossing',()=>{
  const g=new Game('easy',2);g.begin();g.invulnerable=0;g.player={x:461,y:178,vx:105,vy:0};run(g,.3,()=>({dx:1}));assert.ok(g.hp<8);assert.ok(g.player.x<478);
+});
+test('descending onto a rock stops vertically without teleporting sideways, and allows escape',()=>{
+ for(const mode of ['easy','hard']){
+  const g=new Game(mode,2);g.enemies=[];g.invulnerable=0;g.player={x:496,y:135,vx:0,vy:105};
+  run(g,.3,()=>({dy:1}));assert.equal(g.player.x,496);assert.ok(g.player.y<=142);assert.equal(g.player.vy,0);assert.equal(g.hp,g.cfg.hp-1);
+  run(g,.2,()=>({dy:-1}));assert.ok(g.player.y<135);assert.equal(g.player.x,496);
+ }
+});
+test('a helicopter slides up a rock face and can fly away from contact',()=>{
+ const g=new Game('easy',2);g.enemies=[];g.player={x:466,y:178,vx:0,vy:0};
+ run(g,.2,()=>({dx:1,dy:-1}));assert.equal(g.player.x,466);assert.ok(g.player.y<178);
+ run(g,.2,()=>({dx:-1}));assert.ok(g.player.x<466);
+});
+test('sandbag contacts stop at the surface and permit sliding and backing away',()=>{
+ const g=new Game();g.enemies.forEach(e=>e.timer=100);g.player={x:240,y:188,vx:0,vy:0};
+ run(g,.4,()=>({dy:-1}));assert.equal(g.player.y,185);assert.equal(g.player.vy,0);
+ run(g,.1,()=>({dx:1,dy:-1}));assert.ok(g.player.x>240);assert.equal(g.player.y,185);
+ run(g,.1,()=>({dy:1}));assert.ok(g.player.y>185);
+});
+test('shots hit visible tank turrets in flight, while shots above the sprite miss',()=>{
+ for(const y of [201,194]){
+  const g=new Game('easy',2);g.begin();const enemy=g.enemies[0];g.shots=[{x:enemy.x-30,y,vx:350,vy:0,gravity:0,team:'player',life:2}];
+  for(let i=0;i<25;i++)g.projectiles(DT);assert.equal(enemy.hp,y===201?3:4);
+ }
+});
+test('swept shore shots resolve the first wall or target along the path',()=>{
+ for(const wallFirst of [true,false]){
+  const g=new Game();g.begin();const enemy={type:'turret',x:240,y:wallFirst?150:205,hp:3,max:3};g.enemies=[enemy];
+  g.shots=[{x:240,y:230,vx:0,vy:-12000,gravity:0,team:'player',life:2}];g.projectiles(DT);
+  assert.equal(enemy.hp,wallFirst?3:2);assert.equal(g.shots.length,0);
+ }
+});
+test('fast enemy projectiles cannot cross the player between fixed updates',()=>{
+ for(const stage of [0,2,3]){
+  const g=new Game('easy',stage);g.begin();g.invulnerable=0;const p=g.player;
+  g.shots=[{x:p.x-25,y:p.y-(stage===2?0:7),vx:6000,vy:0,gravity:0,team:'enemy',life:2}];g.projectiles(DT);
+  assert.equal(g.hp,7,`stage ${stage}`);assert.equal(g.shots.length,0);
+ }
+});
+test('ducking does not consume a ready throw or delay the next standing throw',()=>{
+ const g=new Game('easy',3);g.begin();g.update(DT,{duck:true,fire:true});assert.equal(g.cooldown,0);assert.equal(g.shots.length,0);
+ g.update(DT,{fire:true});assert.equal(g.shots.filter(s=>s.team==='player').length,1);assert.ok(g.cooldown>0);
 });
 test('duel high throws can be ducked and low throws can be jumped',()=>{
  function projectile(g,y){g.begin();g.invulnerable=0;g.shots=[{x:g.player.x+8,y,vx:-120,vy:0,gravity:0,team:'enemy',life:2}];}
@@ -226,6 +268,10 @@ test('naval splash reports preserve fired elevation and distinguish LONG, SHORT 
   const g=new Game('easy',5);g.begin();const target=g.enemies[0];g.elevation=elevation;g.update(DT,{fire:true,aim:{x:target.x}});g.elevation=target.range/200;run(g,1.05);assert.ok(g.feedback.startsWith(expected),g.feedback);assert.equal(target.hp,2);
  }
  const g=new Game('easy',5);g.begin();g.update(DT,{fire:true,aim:{x:240}});run(g,1.05);assert.ok(g.feedback.startsWith('BEARING OFF'));
+});
+test('holding naval fire keeps the last splash report readable through the next launch',()=>{
+ const g=new Game('easy',5);g.begin();const target=g.enemies[0];g.elevation=5;run(g,1.3,()=>({fire:true,aim:{x:target.x}}));
+ assert.ok(g.salvos.length>0);assert.ok(g.feedback.startsWith('SHORT'),g.feedback);assert.equal(g.report.kind,'range');
 });
 test('naval smoke intercepts incoming salvos, and landing a salvo damages only one ship',()=>{
  const g=new Game('easy',5);g.begin();g.invulnerable=0;g.hazards=[{type:'incoming',x:100,y:130,life:.01,total:1.6,hp:1}];g.update(DT,{special:true});run(g,.1);assert.equal(g.hp,8);assert.equal(g.hazards.length,0);

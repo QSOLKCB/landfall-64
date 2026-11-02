@@ -75,8 +75,11 @@ Both modes checkpoint at stage entry. Retrying restores that stage's starting sc
 
 - One self-contained `index.html`; 480 × 270 pixel Canvas, scaled to the available screen.
 - A fixed 120 Hz simulation with animation driven by `requestAnimationFrame`.
+- Short mouse, keyboard and touch taps are retained until the next simulation step. Cancelled touches and loss of focus clear pending actions.
 - Seeded encounter generation, deterministic physics and replayable input.
+- Swept projectile collisions resolve the first wall, enemy or hazard along a shot's path. Hit areas include visible heads and vehicle turrets. Helicopter and squad movement stop at solid surfaces and slide along them.
 - Original sprite geometry, landscapes, layouts and interface drawn in code.
+- Aimed weapons, gun recoil, muzzle flashes, enemy hit flashes, bright tracer tips and tumbling duel darts. Walking follows actual movement, including touch controls; reduced-motion mode suppresses the new flashes, recoil and dart spin.
 - Original looping mathematical pulse synthesized from waves, integer operations and seeded noise; no recorded soundtrack or borrowed melody.
 - Digitized enemy hit voices cycle between a brisk **“Allons-y!”**, a long falling **“Owwww…”**, and the original **“ahhh”**. Phoneme formants, nasal resonance, fricative noise, pitch glides and sample quantization generate them entirely in code. Ally and commander death cries retain their own timbres. Try the two preview buttons in Mission Control. Voices play one at a time; mute, pause and the Voices checkbox stop speech immediately. No recordings, speech service or browser voice downloads.
 - Grace periods after damage, clear attack warnings, independent audio controls, reduced-motion support and pause on loss of focus.
@@ -91,7 +94,7 @@ The development checks use only Node's built-in test runner. **Node is not neede
 node --test tests/*.test.cjs
 ```
 
-The tests execute the engine and UI handlers extracted from the actual HTML. They cover deterministic replay across all six games in both modes; sprite-aligned and swept cannon hits; safe helicopter landing, pickup and return guidance; damage grace, checkpoints, prisoner safety, duel dodges and campaign progression; bounded deterministic sound; and controllers that complete the campaign stages on Easy and both bonuses on Easy and Hard through normal inputs. UI checks cover touch aiming, keyboard focus, bonus selection, elevation controls, rendering and the campaign debrief shortcut.
+The tests execute the engine and UI handlers extracted from the actual HTML. They cover deterministic replay across all six games in both modes; sprite-aligned hits and first-contact swept collisions; helicopter landing, rock contacts, sliding, pickup and return guidance; damage grace, checkpoints, prisoner safety, duel dodges and campaign progression; readable naval splash reports during continuous fire; bounded deterministic sound; and controllers that complete the campaign stages on Easy and both bonuses on Easy and Hard through normal inputs. UI checks cover short taps, touch aiming and cancellation, keyboard focus, bonus selection, elevation controls, rendering and the campaign debrief shortcut.
 
 ## GitHub Pages
 

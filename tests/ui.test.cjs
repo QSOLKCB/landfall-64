@@ -28,7 +28,7 @@ function fixture(options={}){
  doc.getElementById=id=>elements.get(id);doc.querySelector=()=>modes.find(e=>e.checked);
  doc.querySelectorAll=q=>q==='.mission-card'?cards:q==='[data-key]'?touch:modes;
  const store=new Map();const storage={getItem:k=>store.get(k)||null,setItem:(k,v)=>store.set(k,v)};
- const win={matchMedia:()=>({matches:false}),addEventListener:(k,f)=>winListeners.set(k,f),AudioContext:options.AudioContext};
+ const win={matchMedia:q=>({matches:!!options.reducedMotion&&q.includes('reduced-motion')}),addEventListener:(k,f)=>winListeners.set(k,f),AudioContext:options.AudioContext};
  const sandbox={document:doc,window:win,localStorage:storage,performance:{now:()=>clock},requestAnimationFrame:f=>{pendingFrame=f;},Float32Array,Math};
  const code=source.replace('showMenu();requestAnimationFrame(frame);','showMenu();requestAnimationFrame(frame);globalThis.testApi={get game(){return game;},input,syncStatus,mouse,sound};');
  vm.runInNewContext(code,sandbox,{filename:'index.html browser handlers'});
@@ -36,8 +36,30 @@ function fixture(options={}){
  const click=(id,detail=1)=>{const el=elements.get(id);el.focus();return el.emit('click',{detail});};
  function start(stage=0,mode='easy'){elements.get('stageSelect').value=String(stage);modes[0].checked=mode==='easy';modes[1].checked=mode==='hard';click('deployButton');clock+=500;click('overlayPrimary');}
  const key=(code,target=doc.activeElement)=>{const e={code,target,repeat:false,preventDefault(){this.defaultPrevented=true;}};docListeners.get('keydown')(e);return e;};
- return {api,doc,elements,canvas,click,start,key,render:()=>pendingFrame(clock),tick:(ms=500)=>{clock+=ms;}};
+ return {api,doc,elements,canvas,click,start,key,release:code=>docListeners.get('keyup')({code}),blur:()=>winListeners.get('blur')(),render:()=>pendingFrame(clock),tick:(ms=500)=>{clock+=ms;}};
 }
+test('a complete mouse click between simulation ticks fires once at its retained aim',()=>{
+ const f=fixture();f.start(1);f.render();const point={pointerId:1,pointerType:'mouse',clientX:140,clientY:95};
+ f.canvas.emit('pointerdown',point);f.canvas.emit('pointerup',point);f.canvas.emit('pointerleave');
+ f.tick(17);f.render();assert.equal(f.api.game.shots.length,1);assert.ok(f.api.game.shots[0].vx<0);assert.equal(f.api.input().fire,false);
+});
+test('a quick touch aim and release retains the last drag position for one shot',()=>{
+ const f=fixture();f.start(1);const point={pointerId:2,pointerType:'touch',clientX:140,clientY:95};
+ f.canvas.emit('pointerdown',point);f.canvas.emit('pointermove',{...point,clientX:390,clientY:100});f.canvas.emit('pointerup',point);f.canvas.emit('lostpointercapture',point);
+ const tap=f.api.input();assert.equal(tap.fire,true);assert.equal(tap.aim.x,390);assert.equal(tap.aim.y,100);assert.equal(f.api.input().fire,false);assert.equal(f.api.input().aim,null);
+});
+test('short keyboard and touch button taps reach the next simulation step',()=>{
+ const f=fixture();f.start(3);for(const code of ['Space','KeyE','KeyW']){f.key(code);f.release(code);}
+ const tap=f.api.input();assert.ok(tap.fire&&tap.special&&tap.jump);const next=f.api.input();assert.ok(!next.fire&&!next.special&&!next.jump);
+ const fire=f.elements.get('touchSpace');fire.emit('pointerdown',{pointerId:6});fire.emit('pointerup',{pointerId:6});fire.emit('lostpointercapture',{pointerId:6});assert.equal(f.api.input().fire,true);assert.equal(f.api.input().fire,false);
+});
+test('cancelled pointers and losing focus discard pending taps and held input',()=>{
+ for(const type of ['pointercancel','lostpointercapture']){
+  const f=fixture();f.start(1);const point={pointerId:5,pointerType:'touch',clientX:140,clientY:95};f.canvas.emit('pointerdown',point);f.canvas.emit(type,point);assert.equal(f.api.input().fire,false);
+  const fire=f.elements.get('touchSpace');fire.emit('pointerdown',{pointerId:6});fire.emit(type,{pointerId:6});assert.equal(f.api.input().fire,false);
+ }
+ const f=fixture();f.start();f.key('Space');f.key('KeyE');f.blur();assert.equal(f.api.game.status,'paused');f.click('pauseButton');assert.equal(f.api.input().fire,false);assert.equal(f.api.input().special,false);
+});
 test('rescue touch aiming follows the captured finger and clears on release',()=>{
  const f=fixture();f.start(1);const event={pointerId:7,pointerType:'touch',clientX:100,clientY:90};
  f.canvas.emit('pointerdown',event);assert.equal(f.api.input().aim.x,100);assert.ok(f.api.input().fire);
@@ -75,8 +97,8 @@ test('Skyshield touch aim follows a drag and keyboard aim can take over',()=>{
 test('campaign completion offers the bonus menu without appending bonus stages',()=>{
  const f=fixture();f.start(-1);for(let i=0;i<4;i++){f.api.game.finish();f.api.game.advance();f.api.game.begin();}f.api.syncStatus();assert.equal(f.api.game.status,'won');assert.equal(f.elements.get('overlaySecondary').textContent,'BONUS OPERATIONS →');f.click('overlaySecondary');assert.equal(f.api.game,null);assert.equal(f.elements.get('stageSelect').value,'4');
 });
-test('both bonus views render and naval keyboard bearing takes over from mouse aim',()=>{
- for(const stage of [4,5]){const f=fixture();f.start(stage);f.render();f.tick(16);f.render();}
+test('all six views render with normal and reduced motion; naval keyboard aim can take over',()=>{
+ for(const reducedMotion of [false,true])for(let stage=0;stage<6;stage++){const f=fixture({reducedMotion});f.start(stage);f.render();f.key('Space');f.tick(16);f.render();}
  const f=fixture();f.start(5);f.canvas.emit('pointermove',{pointerType:'mouse',clientX:120,clientY:90});assert.equal(f.api.input().aim.x,120);f.key('KeyD');assert.equal(f.api.input().aim,null);assert.equal(f.api.input().dx,1);
 });
 test('mouse aiming at visible naval hulls damages and sinks every ship in either mode',()=>{
