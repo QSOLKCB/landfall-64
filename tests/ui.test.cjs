@@ -7,7 +7,7 @@ const path=require('node:path');
 const html=fs.readFileSync(path.join(__dirname,'../index.html'),'utf8');
 const source=html.match(/<script id="landfall-code">([\s\S]*?)<\/script>/)[1];
 function fixture(){
- let clock=1000;const elements=new Map(),docListeners=new Map(),winListeners=new Map();
+ let clock=1000,pendingFrame;const elements=new Map(),docListeners=new Map(),winListeners=new Map();
  const doc={activeElement:null,hidden:false,fullscreenElement:null,addEventListener:(k,f)=>docListeners.set(k,f)};
  function element(id,tag='BUTTON'){
   const callbacks=new Map(),classes=new Set();
@@ -23,20 +23,20 @@ function fixture(){
  const gradient={addColorStop(){}};const context=new Proxy({createLinearGradient:()=>gradient},{get:(o,k)=>k in o?o[k]:()=>{}});
  const canvas=elements.get('game');canvas.getContext=()=>context;elements.get('stageSelect').value='-1';
  const modes=[element('easy','INPUT'),element('hard','INPUT')];modes[0].value='easy';modes[1].value='hard';modes[1].checked=false;
- const cards=[0,1,2,3].map(n=>{const e=element('card'+n);e.dataset.stage=String(n);return e;});
+ const cards=[0,1,2,3,4,5].map(n=>{const e=element('card'+n);e.dataset.stage=String(n);return e;});
  const touch=['KeyW','KeyA','KeyS','KeyD','Space','KeyE'].map(k=>{const e=element('touch'+k);e.dataset.key=k;return e;});
  doc.getElementById=id=>elements.get(id);doc.querySelector=()=>modes.find(e=>e.checked);
  doc.querySelectorAll=q=>q==='.mission-card'?cards:q==='[data-key]'?touch:modes;
  const store=new Map();const storage={getItem:k=>store.get(k)||null,setItem:(k,v)=>store.set(k,v)};
  const win={matchMedia:()=>({matches:false}),addEventListener:(k,f)=>winListeners.set(k,f)};
- const sandbox={document:doc,window:win,localStorage:storage,performance:{now:()=>clock},requestAnimationFrame(){},Float32Array,Math};
+ const sandbox={document:doc,window:win,localStorage:storage,performance:{now:()=>clock},requestAnimationFrame:f=>{pendingFrame=f;},Float32Array,Math};
  const code=source.replace('showMenu();requestAnimationFrame(frame);','showMenu();requestAnimationFrame(frame);globalThis.testApi={get game(){return game;},input,syncStatus,mouse};');
  vm.runInNewContext(code,sandbox,{filename:'index.html browser handlers'});
  const api=sandbox.testApi;
  const click=(id,detail=1)=>{const el=elements.get(id);el.focus();return el.emit('click',{detail});};
  function start(stage=0,mode='easy'){elements.get('stageSelect').value=String(stage);modes[0].checked=mode==='easy';modes[1].checked=mode==='hard';click('deployButton');clock+=500;click('overlayPrimary');}
  const key=(code,target=doc.activeElement)=>{const e={code,target,repeat:false,preventDefault(){this.defaultPrevented=true;}};docListeners.get('keydown')(e);return e;};
- return {api,doc,elements,canvas,click,start,key,tick:(ms=500)=>{clock+=ms;}};
+ return {api,doc,elements,canvas,click,start,key,render:()=>pendingFrame(clock),tick:(ms=500)=>{clock+=ms;}};
 }
 test('rescue touch aiming follows the captured finger and clears on release',()=>{
  const f=fixture();f.start(1);const event={pointerId:7,pointerType:'touch',clientX:100,clientY:90};
@@ -64,4 +64,18 @@ test('a primary double click cannot skip the following briefing or final debrief
 test('exhausted Hard practice offers an accurately labelled practice restart',()=>{
  const f=fixture();f.start(2,'hard');f.api.game.lives=1;f.api.game.fail('test');f.api.syncStatus();assert.equal(f.elements.get('overlayPrimary').textContent,'RESTART PRACTICE →');
  f.tick();f.click('overlayPrimary');assert.equal(f.api.game.stage,2);assert.ok(f.api.game.practice);assert.equal(f.api.game.lives,3);assert.equal(f.api.game.status,'brief');
+});
+test('bonus menu cards deploy the selected game and expose naval elevation only when needed',()=>{
+ const f=fixture();f.click('card4');assert.equal(f.elements.get('stageSelect').value,'4');assert.equal(f.elements.get('deployButton').textContent,'LAUNCH BONUS →');f.click('deployButton');assert.equal(f.api.game.stage,4);assert.ok(f.elements.get('navalControls').hidden);
+ const n=fixture();n.start(5);assert.equal(n.elements.get('navalControls').hidden,false);const dial=n.elements.get('elevationDial');dial.value='31.5';dial.emit('input');assert.equal(n.api.game.elevation,31.5);dial.emit('pointerup');assert.equal(n.doc.activeElement,n.canvas);
+});
+test('Skyshield touch aim follows a drag and keyboard aim can take over',()=>{
+ const f=fixture();f.start(4);const touch={pointerId:3,pointerType:'touch',clientX:90,clientY:80};f.canvas.emit('pointerdown',touch);f.canvas.emit('pointermove',{...touch,clientX:180});assert.equal(f.api.input().aim.x,180);f.canvas.emit('pointerup',touch);f.key('KeyD');assert.equal(f.api.input().aim,null);assert.equal(f.api.input().dx,1);
+});
+test('campaign completion offers the bonus menu without appending bonus stages',()=>{
+ const f=fixture();f.start(-1);for(let i=0;i<4;i++){f.api.game.finish();f.api.game.advance();f.api.game.begin();}f.api.syncStatus();assert.equal(f.api.game.status,'won');assert.equal(f.elements.get('overlaySecondary').textContent,'BONUS OPERATIONS →');f.click('overlaySecondary');assert.equal(f.api.game,null);assert.equal(f.elements.get('stageSelect').value,'4');
+});
+test('both bonus views render and naval keyboard bearing takes over from mouse aim',()=>{
+ for(const stage of [4,5]){const f=fixture();f.start(stage);f.render();f.tick(16);f.render();}
+ const f=fixture();f.start(5);f.canvas.emit('pointermove',{pointerType:'mouse',clientX:120,clientY:90});assert.equal(f.api.input().aim.x,120);f.key('KeyD');assert.equal(f.api.input().aim,null);assert.equal(f.api.input().dx,1);
 });
