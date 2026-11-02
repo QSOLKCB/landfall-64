@@ -78,7 +78,7 @@ Both modes checkpoint at stage entry. Retrying restores that stage's starting sc
 - Seeded encounter generation, deterministic physics and replayable input.
 - Original sprite geometry, landscapes, layouts and interface drawn in code.
 - Original looping mathematical pulse synthesized from waves, integer operations and seeded noise; no recorded soundtrack or borrowed melody.
-- New digitized “ahhh” cries generated with harmonic formants, a falling fundamental and quantization. Allies, enemies and the commander have different timbres. No recordings, speech service or browser voice downloads.
+- Digitized enemy hit voices cycle between a brisk **“Allons-y!”**, a long falling **“Owwww…”**, and the original **“ahhh”**. Phoneme formants, nasal resonance, fricative noise, pitch glides and sample quantization generate them entirely in code. Ally and commander death cries retain their own timbres. Try the two preview buttons in Mission Control. Voices play one at a time; mute, pause and the Voices checkbox stop speech immediately. No recordings, speech service or browser voice downloads.
 - Grace periods after damage, clear attack warnings, independent audio controls, reduced-motion support and pause on loss of focus.
 
 The game draws inspiration from the multi-stage arcade rescue genre. Its characters, story, artwork, level layouts, audio and code are original. See [ASSETS.md](ASSETS.md).

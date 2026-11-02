@@ -161,6 +161,34 @@ test('voice and mathematical audio are reproducible, finite, bounded and non-sil
  for(const team of ['ally','enemy','boss']){const a=voiceSamples(team),b=voiceSamples(team);assert.deepEqual(a,b);assert.ok(a.some(n=>n!==0));assert.ok(a.every(n=>Number.isFinite(n)&&Math.abs(n)<=1));}
  const a=mathSamples(),b=mathSamples();assert.deepEqual(a,b);assert.ok(a.every(n=>Number.isFinite(n)&&Math.abs(n)<=1));assert.ok(a.some(n=>Math.abs(n)>.1));assert.equal(a[0],0);
 });
+test('the new phoneme voices are deterministic, distinct, bounded and fade without a click',()=>{
+ const all=voiceSamples('enemy',0,11025,'allons-y'),ow=voiceSamples('enemy',0,11025,'ow');
+ assert.deepEqual(all,voiceSamples('enemy',0,11025,'allons-y'));assert.deepEqual(ow,voiceSamples('enemy',0,11025,'ow'));
+ assert.ok(all.length>8000&&all.length<9500);assert.ok(ow.length>14500&&ow.length<16000);
+ for(const line of [all,ow]){assert.ok(line.every(n=>Number.isFinite(n)&&Math.abs(n)<=1));assert.ok(line.some(n=>Math.abs(n)>.2));assert.equal(Math.abs(line[0]),0);assert.equal(Math.abs(line[line.length-1]),0);}
+ assert.notDeepEqual(all,voiceSamples('enemy',1,11025,'allons-y'));assert.notDeepEqual(ow,voiceSamples('enemy',1,11025,'ow'));
+ // The ally and commander calls retain the original death cry path.
+ assert.deepEqual(voiceSamples('ally'),voiceSamples('ally',0,11025,'ahh'));
+});
+test('confirmed nonlethal hits produce enemy voice cues in all six games',()=>{
+ for(let stage=0;stage<6;stage++){
+  const g=new Game('hard',stage);g.begin();let target;
+  if(stage===1){target={type:'roof',x:80,y:76,hp:2,max:2,timer:100};g.enemies=[target];}
+  else if(stage===3){target=g.boss;target.phase='recover';}
+  else if(stage===4){target={type:'plane',x:200,y:100,r:10,hp:2,max:2};g.enemies=[target];}
+  else target=g.enemies[0];
+  const before=target.hp;
+  if(stage===5){g.elevation=target.range/200;g.update(DT,{fire:true,aim:{x:target.x}});for(let i=0;i<125;i++)g.update(DT,{});}
+  else{g.shoot(target.x,target.y+(stage===3?-6:14),target.x,target.y-12,'player',240);g.projectiles(.05);}
+  assert.equal(target.hp,before-1,`stage ${stage}`);assert.equal(g.events.filter(e=>e.type==='hitEnemy').length,1,`stage ${stage} should cue one hit voice`);
+ }
+});
+test('lethal hits emit one enemy voice and blocked shots or hazards do not emit hit voices',()=>{
+ const g=new Game('easy',1);g.begin();const enemy={type:'roof',x:80,y:76,hp:1,max:1};g.enemies=[enemy];g.shoot(80,90,80,60,'player',240);g.projectiles(.04);
+ assert.ok(enemy.dead);assert.equal(g.events.filter(e=>e.type==='hitEnemy').length,0);assert.equal(g.events.filter(e=>e.type==='voice'&&e.team==='enemy').length,1);
+ const shield=new Game();shield.begin();shield.shoot(240,55,240,34,'player',240);shield.projectiles(.06);assert.equal(shield.enemies[3].hp,12);assert.equal(shield.events.filter(e=>e.type==='hitEnemy'||e.type==='voice').length,0);
+ const hazard=new Game('easy',1);hazard.begin();hazard.hazards=[{type:'mine',x:240,y:195,hp:1}];hazard.shoot(240,220,240,180,'player',390);hazard.projectiles(.08);assert.equal(hazard.events.filter(e=>e.type==='hitEnemy'||e.type==='voice').length,0);
+});
 test('a normal input controller can beat each Easy mission without engine state changes',()=>{
  const results=[];
  const shore=new Game('easy',0);let phase=0;
