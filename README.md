@@ -77,7 +77,7 @@ The game draws inspiration from the multi-stage arcade rescue genre. Its charact
 The development checks use only Node's built-in test runner. **Node is not needed to play.**
 
 ```sh
-node --test tests/game.test.cjs
+node --test tests/*.test.cjs
 ```
 
 The tests execute the engine extracted from the actual HTML. They cover deterministic replay in all stages and both modes, collisions, damage grace, checkpoints, continues, prisoner safety, hover extraction, duel dodges, stage progression, sound generation and an Easy controller that completes all four missions through normal game inputs.

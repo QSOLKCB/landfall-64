@@ -8,7 +8,7 @@ const html=fs.readFileSync(path.join(__dirname,'../index.html'),'utf8');
 const code=html.match(/<script id="landfall-code">([\s\S]*?)<\/script>/)[1];
 const sandbox={module:{exports:{}},Float32Array,Math};
 vm.runInNewContext(code,sandbox,{filename:'index.html'});
-const {Game,MODES,DT,voiceSamples,mathSamples,rng}=sandbox.module.exports;
+const {Game,MODES,DT,voiceSamples,mathSamples,recordBest,rng}=sandbox.module.exports;
 function run(g,seconds,controller=()=>({})){g.begin();for(let i=0;i<Math.round(seconds/DT)&&g.status==='play';i++){g.update(DT,controller(g,i));g.events=[];}return g;}
 test('the distributable has no remote assets, imports, runtime fetches or dependencies',()=>{
  assert.ok(Buffer.byteLength(html)<85*1024);
@@ -74,6 +74,18 @@ test('commander guard blocks darts but recovery allows hits',()=>{
  const g=new Game('easy',3);g.begin();const hp=g.boss.hp;
  function hit(){g.shots=[{x:375,y:189,vx:220,vy:0,gravity:0,team:'player',life:2}];g.projectiles(.03);}
  hit();assert.equal(g.boss.hp,hp);g.boss.phase='recover';hit();assert.equal(g.boss.hp,hp-1);
+});
+test('a lethal volley finishes the duel once, without overkill score or return damage',()=>{
+ const g=new Game('easy',3);g.begin();g.invulnerable=0;g.boss.hp=1;g.boss.phase='recover';
+ g.shots=[0,1,2].map(()=>({x:375,y:189,vx:220,vy:0,gravity:0,team:'player',life:2}));
+ g.shots.push({x:100,y:182,vx:0,vy:0,gravity:0,team:'enemy',life:2});g.projectiles(.03);
+ assert.equal(g.boss.hp,0);assert.equal(g.status,'clear');assert.equal(g.hp,8);assert.equal(g.score,60+500+8*50);
+});
+test('saving a record merges newer same-mode and other-mode records from storage',()=>{
+ let value=JSON.stringify({easy:12000,hard:9000});const storage={getItem:()=>value,setItem:(_,s)=>{value=s;}};
+ const result=recordBest({easy:2000,hard:0},'easy',7000,storage);assert.equal(result.easy,12000);assert.equal(result.hard,9000);assert.equal(JSON.parse(value).hard,9000);
+ const second=recordBest({easy:0,hard:2000},'hard',10000,storage);assert.equal(second.easy,12000);assert.equal(second.hard,10000);
+ const broken={getItem:()=>{throw Error('blocked');}};assert.equal(recordBest({},'easy',500,broken).easy,500);
 });
 test('a complete campaign transitions through all four stages; practice stops at its stage',()=>{
  const g=new Game();for(let i=0;i<4;i++){assert.equal(g.stage,i);g.begin();g.finish();g.advance();}assert.equal(g.status,'won');

@@ -19,7 +19,7 @@ jobs:
         with:
           persist-credentials: false
       - name: Test the actual HTML game engine
-        run: node --test tests/game.test.cjs
+        run: node --test tests/*.test.cjs
 
   deploy:
     name: Publish to GitHub Pages
