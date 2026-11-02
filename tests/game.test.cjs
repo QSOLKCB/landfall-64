@@ -16,8 +16,8 @@ test('the distributable has no remote assets, imports, runtime fetches or depend
  assert.doesNotMatch(code,/\b(?:fetch|XMLHttpRequest|WebSocket|importScripts|speechSynthesis)\s*\(/);
  assert.equal((html.match(/<script\b/g)||[]).length,1);
 });
-test('same seed and input replay exactly in all four missions and both modes',()=>{
- for(const mode of ['easy','hard'])for(let stage=0;stage<4;stage++){
+test('same seed and input replay exactly in all six games and both modes',()=>{
+ for(const mode of ['easy','hard'])for(let stage=0;stage<6;stage++){
   const a=new Game(mode,stage),b=new Game(mode,stage);
   const control=(_,i)=>({dx:Math.sin(i/180),dy:Math.cos(i/140),fire:true,special:i%1000===0,jump:i%500<8,duck:i%700>500});
   run(a,12,control);run(b,12,control);
@@ -50,6 +50,37 @@ test('friendly shots never damage evacuees',()=>{
  const g=new Game('easy',1);g.begin();g.civilians=[{x:240,y:190,hp:2,safe:0,id:0}];g.nextCivilian=100;g.nextHazard=100;
  for(let i=0;i<5;i++)g.shoot(240,230,240,190,'player',390);run(g,.16);assert.equal(g.civilians[0].hp,2);assert.equal(g.lost,0);
 });
+test('rescue cannon hits the visible heads of small rooftop enemies in both modes',()=>{
+ for(const mode of ['easy','hard'])for(const x of [80,240,400]){
+  const g=new Game(mode,1),enemy={type:'roof',x,y:76,hp:2,max:2,timer:100};
+  g.enemies=[enemy];g.nextCivilian=100;g.nextHazard=100;
+  run(g,1.3,()=>({fire:true,aim:{x,y:62}}));
+  assert.equal(enemy.hp,0,`${mode} rooftop head at x=${x}`);assert.ok(enemy.dead);
+ }
+});
+test('rescue cannon hits upper vehicle sprites instead of passing through their turrets',()=>{
+ for(const type of ['tank','buggy'])for(const x of [40,440]){
+  const g=new Game('easy',1),enemy={type,x,y:184,hp:2,max:2,timer:100};
+  g.enemies=[enemy];g.nextCivilian=100;g.nextHazard=100;
+  run(g,1.3,()=>({fire:true,aim:{x,y:170}}));assert.equal(enemy.hp,0,`${type} top at x=${x}`);
+ }
+});
+test('a rescue projectile crossing a small sprite between updates registers exactly one hit',()=>{
+ const g=new Game('easy',1),enemy={type:'roof',x:200,y:76,hp:2,max:2,timer:100};g.enemies=[enemy];g.begin();
+ g.shots=[{x:180,y:62,vx:4800,vy:0,gravity:0,team:'player',life:2}];g.projectiles(DT);
+ assert.equal(enemy.hp,1);assert.equal(g.shots.length,0);
+});
+test('rescue shots stop on the first hazard or enemy along the actual flight path',()=>{
+ for(const hazardFirst of [true,false]){
+  const g=new Game('easy',1),enemy={type:'roof',x:240,y:hazardFirst?76:150,hp:2,max:2,timer:100},hazard={type:'stone',x:240,y:hazardFirst?150:76,hp:1};
+  g.enemies=[enemy];g.hazards=[hazard];g.begin();g.shots=[{x:240,y:240,vx:0,vy:-24000,gravity:0,team:'player',life:2}];g.projectiles(DT);
+  assert.equal(enemy.hp,hazardFirst?2:1);assert.equal(hazard.hp,hazardFirst?0:1);assert.equal(g.shots.length,0);
+ }
+});
+test('a rescue shot outside a small enemy sprite remains a miss',()=>{
+ const g=new Game('easy',1),enemy={type:'roof',x:80,y:76,hp:2,max:2,timer:100};g.enemies=[enemy];g.nextCivilian=100;g.nextHazard=100;
+ run(g,1.3,()=>({fire:true,aim:{x:105,y:62}}));assert.equal(enemy.hp,2);assert.ok(!enemy.dead);
+});
 test('rescue requires enough survivors, not just exhausting the wave',()=>{
  const win=new Game('easy',1);win.saved=4;win.lost=4;win.spawned=8;run(win,.02);assert.equal(win.status,'clear');assert.equal(win.rescued,4);
  const lose=new Game('hard',1);lose.saved=5;lose.lost=5;lose.spawned=10;run(lose,.02);assert.equal(lose.status,'failed');
@@ -60,6 +91,38 @@ test('hover collection needs position and speed; extraction needs both pads',()=
  g.player={x:1920,y:120,vx:0,vy:0};run(g,.03);assert.equal(g.status,'play');
  g.player={x:1280,y:195,vx:0,vy:0};run(g,1.2);assert.equal(g.cargo,8);
  g.player={x:1920,y:120,vx:0,vy:0};run(g,.03);assert.equal(g.status,'clear');
+});
+test('holding descent lands safely on either pickup pad and boards the crew',()=>{
+ for(const mode of ['easy','hard']){
+  const g=new Game(mode,2);g.enemies=[];g.begin();g.invulnerable=0;
+  for(const pad of g.pads){
+   g.player={x:pad.x,y:190,vx:0,vy:0};run(g,3,()=>({dy:1}));
+   assert.equal(g.hp,g.cfg.hp,`${mode}: a pickup pad must not damage the helicopter`);assert.ok(pad.done);assert.equal(g.player.y,pad.y-9);
+  }
+  assert.equal(g.cargo,g.rescued);assert.equal(g.status,'play');
+ }
+});
+test('the carrier supports a safe landing while crew remain ashore',()=>{
+ const g=new Game('easy',2);g.enemies=[];g.begin();g.invulnerable=0;g.player={x:1920,y:185,vx:0,vy:0};run(g,3,()=>({dy:1}));
+ assert.equal(g.hp,8);assert.equal(g.player.y,205);assert.equal(g.status,'play');assert.equal(g.cargo,0);
+});
+test('the full safe landing width also permits boarding',()=>{
+ for(const offset of [-30,30]){const g=new Game('easy',2);g.enemies=[];const pad=g.pads[0];g.player={x:pad.x+offset,y:190,vx:0,vy:0};run(g,2,()=>({dy:1}));assert.ok(pad.done);assert.equal(g.cargo,pad.count);}
+});
+test('a fully loaded helicopter can complete extraction while landed on the carrier',()=>{
+ const g=new Game('easy',2);g.enemies=[];g.pads.forEach(p=>p.done=true);g.cargo=g.rescued;g.player={x:1920,y:205,vx:0,vy:0};run(g,.03);
+ assert.equal(g.status,'clear');
+});
+test('flight guidance points back to the nearest uncollected pad with the real distance',()=>{
+ const g=new Game('easy',2);g.player={x:1920,y:120,vx:0,vy:0};
+ let guide=g.flightGuide();assert.equal(guide.index,2);assert.equal(guide.direction,-1);assert.equal(guide.distance,640);
+ g.pads[1].done=true;guide=g.flightGuide();assert.equal(guide.index,1);assert.equal(guide.direction,-1);assert.equal(guide.distance,1218);
+ g.player.x=702;guide=g.flightGuide();assert.equal(guide.direction,0);assert.equal(guide.distance,0);
+ g.pads[0].done=true;guide=g.flightGuide();assert.equal(guide.pad,null);assert.equal(guide.direction,1);assert.equal(guide.distance,1218);
+});
+test('landing protection applies only to actual pads and the carrier',()=>{
+ const g=new Game('easy',2);g.enemies=[];g.begin();g.invulnerable=0;g.player={x:800,y:210,vx:0,vy:0};run(g,1.5,()=>({dy:1}));
+ assert.ok(g.hp<g.cfg.hp);assert.equal(g.cargo,0);assert.ok(g.pads.every(p=>!p.done));
 });
 test('rock spires cause damage and reject crossing',()=>{
  const g=new Game('easy',2);g.begin();g.invulnerable=0;g.player={x:461,y:178,vx:105,vy:0};run(g,.3,()=>({dx:1}));assert.ok(g.hp<8);assert.ok(g.player.x<478);
@@ -119,3 +182,41 @@ test('a normal input controller can beat each Easy mission without engine state 
 });
 function dist2(a,b){return Math.hypot(a.x-b.x,a.y-b.y);}
 function clamp2(v){return Math.max(-1,Math.min(1,v));}
+test('both bonuses are standalone and leave the four-stage campaign ending intact',()=>{
+ for(const stage of [4,5]){const g=new Game('easy',stage);assert.ok(g.practice);g.begin();g.finish();g.advance();assert.equal(g.status,'won');assert.equal(g.stage,stage);}
+ const campaign=new Game();for(let i=0;i<4;i++){campaign.begin();campaign.finish();campaign.advance();}assert.equal(campaign.stage,3);assert.equal(campaign.status,'won');
+});
+test('Skyshield has a replenishing loader and interceptable bombs',()=>{
+ const g=new Game('easy',4);g.nextPlane=100;run(g,3,()=>({fire:true}));assert.ok(g.rounds>=0&&g.rounds<1);run(g,3);assert.equal(g.rounds,6);
+ g.hazards=[{type:'bomb',x:240,y:130,vx:0,vy:0,hp:1}];g.shots=[{x:240,y:170,vx:0,vy:-10800,gravity:0,team:'player',life:2}];g.projectiles(DT);assert.equal(g.hazards[0].hp,0);assert.equal(g.shots.length,0);assert.equal(g.hp,8);
+});
+test('Skyshield waits for the last plane and bomb to resolve before clearing',()=>{
+ const g=new Game('easy',4);g.begin();g.spawned=g.raidTotal;g.hazards=[{type:'bomb',x:240,y:150,vx:0,vy:0,hp:1}];g.update(DT,{});assert.equal(g.status,'play');g.hazards[0].hp=0;g.update(DT,{});assert.equal(g.status,'clear');
+});
+test('naval splash reports preserve fired elevation and distinguish LONG, SHORT and bearing misses',()=>{
+ for(const [elevation,expected] of [[5,'SHORT'],[50,'LONG']]){
+  const g=new Game('easy',5);g.begin();const target=g.enemies[0];g.elevation=elevation;g.update(DT,{fire:true,aim:{x:target.x}});g.elevation=target.range/200;run(g,1.05);assert.ok(g.feedback.startsWith(expected),g.feedback);assert.equal(target.hp,2);
+ }
+ const g=new Game('easy',5);g.begin();g.update(DT,{fire:true,aim:{x:240}});run(g,1.05);assert.ok(g.feedback.startsWith('BEARING OFF'));
+});
+test('naval smoke intercepts incoming salvos, and landing a salvo damages only one ship',()=>{
+ const g=new Game('easy',5);g.begin();g.invulnerable=0;g.hazards=[{type:'incoming',x:100,y:130,life:.01,total:1.6,hp:1}];g.update(DT,{special:true});run(g,.1);assert.equal(g.hp,8);assert.equal(g.hazards.length,0);
+ const e=g.enemies[0];g.elevation=e.range/200;g.update(DT,{fire:true,aim:{x:e.x}});run(g,1.05);assert.equal(e.hp,1);assert.ok(g.enemies.slice(1).every(s=>s.hp===2));
+});
+test('normal controllers can finish both bonuses on Easy and Hard',()=>{
+ for(const mode of ['easy','hard']){
+  const sky=new Game(mode,4),previous=new WeakMap();
+  run(sky,80,g=>{
+   const targets=[...g.hazards.filter(h=>h.hp>0),...g.enemies.filter(e=>!e.dead)];let aim={x:240,y:100};
+   for(const t of targets){const old=previous.get(t);t===targets[0]&&(aim={x:t.x,y:t.y});if(t===targets[0]&&old){const travel=Math.hypot(t.x-240,t.y-235)/360;aim={x:t.x+(t.x-old.x)/DT*travel,y:t.y+(t.y-old.y)/DT*travel};}previous.set(t,{x:t.x,y:t.y});}
+   return {fire:true,aim,special:g.hazards.length>0};
+  });assert.equal(sky.status,'clear',`${mode} Skyshield hp=${sky.hp}, down=${sky.planesDown}, time=${sky.time}`);
+  const naval=new Game(mode,5);let current=null,desired=18,lastReport=null;
+  run(naval,100,g=>{
+   const target=g.enemies.find(e=>!e.dead);if(!target)return {};
+   if(target!==current){current=target;desired=18;lastReport=null;}
+   if(g.report&&g.report!==lastReport&&g.report.kind==='range'&&g.report.target===target.x){desired=Math.max(5,Math.min(50,g.elevation-g.report.delta/200));lastReport=g.report;}
+   return {aim:{x:target.x},dy:clamp2((g.elevation-desired)/(7*DT)),fire:Math.abs(g.elevation-desired)<.02,special:g.hazards.some(h=>h.life<.35)};
+  });assert.equal(naval.status,'clear',`${mode} Iron Horizon hp=${naval.hp}, sunk=${naval.shipsDown}, time=${naval.time}`);
+ }
+});

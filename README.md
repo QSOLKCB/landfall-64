@@ -1,8 +1,8 @@
 # LANDFALL 64
 
-**Four missions. One island. No quarter required.**
+**Four missions. Two naval bonuses. No quarter required.**
 
-An original C64-style arcade campaign in one HTML file: Canvas, vanilla JavaScript and Web Audio. No packages, installation, build step, external assets, accounts or runtime network requests. The complete game is under 65 KB uncompressed.
+An original C64-style arcade campaign in one HTML file: Canvas, vanilla JavaScript and Web Audio. No packages, installation, build step, external assets, accounts or runtime network requests. The complete game, including both bonuses, is under 85 KB uncompressed.
 
 **[Play on GitHub Pages](https://qsolkcb.github.io/landfall-64/)** · [Source](index.html)
 
@@ -25,16 +25,27 @@ Open `http://localhost:8000`. Python is optional and is not part of the game.
 | --- | --- | --- |
 | **01 · Shore assault** | Move your squad through sandbag cover, silence three sentry guns, destroy the bunker and enter the amber gate. | Throw a grenade towards your aim, within a 175-pixel range. |
 | **02 · Courtyard rescue** | Use a fixed gun to protect evacuees from rooftop attackers, mines, armoured vehicles and falling debris. Friendly fire is disabled. | Rally the crew: a short burst of speed and protection. |
-| **03 · Helicopter escape** | Fly over the rock spires, hover above both amber pads to collect the survivors, then reach the offshore carrier. | Clear incoming shots and deploy a temporary defensive flare. |
+| **03 · Helicopter escape** | Fly over the rock spires, land or hover above both amber pads to collect the survivors, then reach the offshore carrier. | Clear incoming shots and deploy a temporary defensive flare. |
 | **04 · Last light duel** | Throw darts across the channel while the commander recovers. Jump low throws, duck high throws and watch the guard. | Raise a short-lived shield. |
 
-Play the full campaign or select any mission for standalone practice. Briefings and controls are shown before every stage. Crew rescued in the courtyard become the helicopter's passengers. Campaign high scores are saved separately for each difficulty in browser storage; blocked storage does not prevent play. Practice does not overwrite campaign records.
+Play the full campaign or select any mission for standalone practice. Briefings and controls are shown before every stage. Crew rescued in the courtyard become the helicopter's passengers. Follow the amber arrow to the nearest uncollected pad, land or hover low, and stop horizontal movement for one second to board them. Collect both pads before returning to the cyan carrier. Pads behind you display a left arrow and their actual distance; pads and the carrier support safe landings. Campaign high scores are saved separately for each difficulty in browser storage; blocked storage does not prevent play. Practice does not overwrite campaign records.
+
+## Bonus operations
+
+Both bonus games are available directly from the menu, in either difficulty. The original campaign still ends after the commander duel; its debrief also offers a shortcut to the bonus menu. Bonus scores do not overwrite campaign records.
+
+| Bonus | Mechanics | Controls |
+| --- | --- | --- |
+| **B1 · Skyshield** | Defend the fleet with shipboard anti-aircraft guns. Lead approaching planes, intercept falling bombs and catch scout aircraft for extra points. Six ready shells replenish continuously, encouraging short bursts. Survive the complete raid. | Mouse or WASD/arrows aim; click/Space fires; `E` deploys a flak barrage and reloads the ready shells. |
+| **B2 · Iron Horizon** | Sink the opposing fleet with heavy naval guns. Align a ship, fire a ranging salvo, then correct elevation using LONG/SHORT splash reports. One degree adds 200m of arcade range. Incoming salvos are telegraphed; smoke disrupts them. | Mouse or A/D sets bearing; W/S sets elevation; Shift gives fine elevation control; click/Space fires; `E` lays smoke. A slider also controls elevation with mouse or touch. |
+
+The bonus mechanics reference the anti-aircraft and ranging-gun sequences in the [1983 Beach-Head manual](https://www.mocagh.org/miscgame/beachhead-manual.pdf). Skyshield and Iron Horizon have original names, artwork, layouts, code and synthesized sound.
 
 ## Controls
 
 | Input | Action |
 | --- | --- |
-| `W A S D` or arrow keys | Move / fly; move the aim in the fixed-gun rescue stage. |
+| `W A S D` or arrow keys | Move / fly; move the aim in the fixed-gun rescue stage. Use `S` / Down to land the helicopter on amber pads or the carrier. |
 | Mouse | Aim. |
 | Left mouse button or `Space` | Fire / throw. Hold for continuous fire. |
 | `W` / Up in the duel | Jump. Release before the next jump. |
@@ -80,7 +91,7 @@ The development checks use only Node's built-in test runner. **Node is not neede
 node --test tests/*.test.cjs
 ```
 
-The tests execute the engine extracted from the actual HTML. They cover deterministic replay in all stages and both modes, collisions, damage grace, checkpoints, continues, prisoner safety, hover extraction, duel dodges, stage progression, sound generation and an Easy controller that completes all four missions through normal game inputs.
+The tests execute the engine and UI handlers extracted from the actual HTML. They cover deterministic replay across all six games in both modes; sprite-aligned and swept cannon hits; safe helicopter landing, pickup and return guidance; damage grace, checkpoints, prisoner safety, duel dodges and campaign progression; bounded deterministic sound; and controllers that complete the campaign stages on Easy and both bonuses on Easy and Hard through normal inputs. UI checks cover touch aiming, keyboard focus, bonus selection, elevation controls, rendering and the campaign debrief shortcut.
 
 ## GitHub Pages
 

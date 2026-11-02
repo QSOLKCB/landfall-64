@@ -4,18 +4,22 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#101e24">
-<meta name="description" content="Four missions. One island. A tiny, original arcade campaign made with Canvas, Web Audio and a little mathematics. Play offline; no downloads or dependencies.">
+<meta name="description" content="Four island missions and two naval bonus games. Original pixel arcade action with Canvas, Web Audio and a little mathematics. Play offline; no downloads or dependencies.">
 <title>LANDFALL 64 · Operation Last Light</title>
 <style>
 :root{color-scheme:dark;--bg:#101e24;--panel:#14272d;--line:#34494c;--muted:#a0b3ac;--ink:#eee9d5;--gold:#efb34e;--green:#8ec5a0;--red:#e27462;font-family:"Courier New",monospace;font-size:14px}
 *{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);min-height:100vh}button,input,select{font:inherit}button{cursor:pointer}button,select{color:var(--ink);background:transparent;border:1px solid var(--line);border-radius:2px}button:hover,select:hover{border-color:var(--gold)}button:focus-visible,input:focus-visible,select:focus-visible,canvas:focus-visible{outline:2px solid var(--gold);outline-offset:4px}button:disabled{opacity:.35;cursor:default}button[aria-pressed=true]{border-color:var(--gold);color:var(--gold)}button{padding:10px 12px}button.primary{background:var(--gold);border-color:var(--gold);color:#15232a;font-weight:bold;letter-spacing:.06em;padding:15px;width:100%}button.primary:hover{background:#ffd181}button.small{font-size:11px;padding:7px 9px}button.quiet{color:var(--muted)}button[hidden],[hidden]{display:none!important}.shell{width:min(1360px,100%);margin:auto;padding:0 36px}header{height:92px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--line);gap:20px}.brand{font-size:22px;letter-spacing:-1px;font-weight:bold}.brand span{color:var(--gold);margin-left:7px}.brand small{font-size:10px;color:var(--muted);font-weight:normal;letter-spacing:.12em;display:block;margin-top:5px}.header-right{display:flex;align-items:center;gap:24px}.status{font-size:10px;letter-spacing:.12em;color:var(--muted)}.status::before{content:"";display:inline-block;width:6px;height:6px;background:var(--green);margin-right:9px}.toolbar{display:flex;gap:6px}.eyebrow{color:var(--gold);font-size:10px;letter-spacing:.16em;text-transform:uppercase}.topline{display:flex;justify-content:space-between;align-items:center;padding:25px 0 16px}.topline h1{font-size:13px;letter-spacing:.12em;margin:0;font-weight:normal}.topline span{font-size:10px;color:var(--muted)}.layout{display:grid;grid-template-columns:minmax(0,1fr) 248px;border:1px solid var(--line)}.viewport{position:relative;min-width:0;background:#0d1b23;align-self:start;isolation:isolate}.viewport::after{content:"";position:absolute;inset:0;pointer-events:none;box-shadow:inset 0 0 70px #0003;z-index:2}canvas{display:block;width:100%;height:auto;aspect-ratio:16/9;image-rendering:pixelated;touch-action:none}canvas.playing{cursor:crosshair}.menu-copy{position:absolute;left:5%;top:10%;width:53%;pointer-events:none;z-index:1}.menu-copy h2{font-size:clamp(30px,5.3vw,72px);line-height:.94;letter-spacing:-.06em;margin:18px 0;color:var(--ink);text-shadow:3px 3px #14272d}.menu-copy h2 strong{color:var(--gold);font-weight:inherit}.menu-copy p{font-size:clamp(10px,1vw,13px);line-height:1.7;color:#c2cfc0;max-width:260px;margin-top:20px}.menu-tag{font-size:9px;color:var(--green);border-left:2px solid var(--green);padding:6px 9px;margin-top:25px;letter-spacing:.08em}.screen-label{position:absolute;bottom:15px;left:5%;font-size:9px;color:#94b6ad;letter-spacing:.1em;z-index:1}.console{padding:23px 19px;background:var(--panel);border-left:1px solid var(--line);display:flex;flex-direction:column;gap:18px}.console h2{font-size:22px;letter-spacing:-.05em;margin:7px 0 8px}.console p{font-size:11px;line-height:1.7;color:var(--muted);margin:0}.rule{border-top:1px solid var(--line);padding-top:15px}fieldset{border:0;padding:0;margin:0}legend,.field-label{display:block;font-size:10px;color:var(--muted);letter-spacing:.1em;margin-bottom:10px}legend{padding:0}.mode-options{display:grid;grid-template-columns:1fr 1fr;gap:8px}.mode-options label{position:relative;cursor:pointer}.mode-options input{position:absolute;opacity:0;inset:0;width:100%;height:100%;margin:0;cursor:pointer}.mode-options span{display:block;text-align:center;border:1px solid var(--line);padding:12px 5px;font-size:11px}.mode-options input:checked+span{background:#efb34e14;color:var(--gold);border-color:var(--gold)}.mode-options input:focus-visible+span{outline:2px solid var(--gold);outline-offset:3px}.mode-note{font-size:10px!important;min-height:48px;margin-top:9px!important}select{width:100%;padding:10px 5px;font-size:11px}select option{background:var(--panel)}.sound-options{display:flex;gap:14px;flex-wrap:wrap;font-size:10px;color:var(--muted)}.sound-options label{display:flex;align-items:center;gap:5px}.sound-options input{accent-color:var(--gold);margin:0}.console .deploy{margin-top:auto}.under-deploy{display:block;font-size:9px;color:var(--muted);text-align:center;margin-top:10px}.mission-status{display:grid;grid-template-columns:1fr 1fr;gap:16px}.metric small{font-size:9px;color:var(--muted);display:block;margin-bottom:6px}.metric strong{font-size:22px;font-weight:normal;color:var(--gold)}.progress{height:4px;background:#2e4346;margin-top:15px}.progress span{display:block;height:100%;background:var(--green);width:0}.keyline{font-size:10px!important;line-height:2!important}.keyline b{color:var(--ink);font-weight:normal}.mission-strip{display:grid;grid-template-columns:repeat(4,1fr);gap:0;margin-top:19px;border:1px solid var(--line)}.mission-card{display:flex;gap:12px;text-align:left;padding:16px 12px;border:0;border-right:1px solid var(--line);border-radius:0;align-items:center}.mission-card:last-child{border-right:0}.mission-card:hover,.mission-card.active{background:#efb34e0c}.mission-card.active{box-shadow:inset 0 -2px var(--gold)}.mission-card .number{font-size:24px;color:#77908c}.mission-card.active .number{color:var(--gold)}.mission-card b{display:block;font-size:11px;letter-spacing:.04em;margin-bottom:4px;font-weight:normal}.mission-card small{color:var(--muted);font-size:9px}.mission-card em{display:block;font-size:9px;color:var(--green);font-style:normal;margin-top:5px}.foot{display:flex;justify-content:space-between;gap:20px;color:var(--muted);font-size:10px;line-height:1.6;padding:20px 0}.foot a{color:var(--muted)}.overlay{position:absolute;inset:0;background:#0a1c24df;display:flex;align-items:center;justify-content:center;z-index:3;text-align:center;padding:20px}.modal{max-width:350px}.modal h2{font-size:28px;color:var(--gold);letter-spacing:-.03em;margin:12px 0}.modal p{font-size:12px;color:#bac9be;line-height:1.8;white-space:pre-line}.modal .actions{display:flex;gap:8px;justify-content:center;margin-top:20px;flex-wrap:wrap}.modal .actions .primary{width:auto;min-width:150px}.touch-pad{display:flex;justify-content:space-between;padding:10px 0;gap:18px;touch-action:none;user-select:none}.dpad{display:grid;grid-template-columns:44px 44px 44px;grid-template-rows:38px 38px;gap:4px}.dpad button{padding:5px}.dpad [data-key=KeyW]{grid-column:2}.dpad [data-key=KeyA]{grid-column:1;grid-row:2}.dpad [data-key=KeyS]{grid-column:2;grid-row:2}.dpad [data-key=KeyD]{grid-column:3;grid-row:2}.touch-actions{display:flex;gap:8px;align-items:stretch}.touch-actions button{min-width:68px;font-size:11px;background:var(--panel)}.touch-actions button:first-child{color:var(--gold)}
 @media(min-width:1500px){.menu-copy h2{font-size:76px}}@media(max-width:1000px){.shell{padding:0 18px}.layout{grid-template-columns:minmax(0,1fr) 210px}.console{padding:16px 13px;gap:13px}.console h2{font-size:20px}.console p{font-size:10px}.menu-copy p{max-width:210px}.menu-tag{margin-top:14px}.mission-card{padding:13px 8px;gap:7px}.mission-card .number{font-size:18px}.status{display:none}}@media(max-width:700px){.shell{padding:0 12px}header{height:72px}.brand{font-size:19px}.header-right{gap:0}.toolbar button{font-size:10px;padding:7px}.topline{padding:18px 0 12px}.topline span{display:none}.layout{grid-template-columns:1fr}.console{border-left:0;border-top:1px solid var(--line);display:grid;grid-template-columns:1fr 1fr;gap:16px}.console .deploy{align-self:end}.console .sound-options{grid-column:1/-1}.console #activePanel{grid-column:1/-1}.console .intro-head{grid-column:1/-1}.console .rule{padding-top:0;border:0}.menu-copy h2{font-size:clamp(28px,9vw,60px);margin:10px 0}.menu-copy p{font-size:10px;margin-top:10px;line-height:1.5;max-width:180px}.menu-tag{display:none}.screen-label{font-size:7px;bottom:10px}.mission-strip{grid-template-columns:1fr 1fr;margin-top:12px}.mission-card{border-bottom:1px solid var(--line);padding:12px}.mission-card:nth-child(even){border-right:0}.mission-card:nth-child(n+3){border-bottom:0}.foot{font-size:9px;padding-top:14px}.foot span:last-child{display:none}body.in-game .console{display:block;padding:12px}body.in-game .intro-head,body.in-game .sound-options{display:none}body.in-game #activePanel>p,body.in-game #activePanel .rule{display:none}body.in-game .mission-status{grid-template-columns:repeat(4,1fr)}body.in-game .metric strong{font-size:16px}body.in-game .metric small{font-size:8px}body.in-game .progress{margin-top:9px}body.in-game .mission-strip{display:none}.modal h2{font-size:22px}.modal p{font-size:10px}.modal .actions{margin-top:12px}.modal .actions button{padding:10px}.overlay{padding:14px}}@media(prefers-reduced-motion:reduce){.viewport::after{box-shadow:none}}
 </style>
+<style>
+@media(min-width:701px){body.in-game .console{gap:10px;padding:16px}body.in-game .console p{line-height:1.55}}
+.bonus-heading{margin:19px 0 10px;display:flex;justify-content:space-between;gap:10px}.bonus-heading small{color:var(--muted);font-size:9px;letter-spacing:0}.bonus-strip{display:grid;grid-template-columns:1fr 1fr;border:1px solid var(--line)}.bonus-card .number{color:var(--gold)}#navalControls{margin:8px 0}#elevationDial{width:100%;accent-color:var(--gold)}#elevationReadout{display:block;color:var(--gold);font-size:12px;margin-top:6px}@media(max-width:700px){body.in-game .bonus-heading,body.in-game .bonus-strip{display:none}.bonus-heading small{display:none}.bonus-strip .mission-card{border-bottom:0}.bonus-strip .mission-card:first-child{border-right:1px solid var(--line)}}
+</style>
 </head>
 <body>
 <div class="shell">
   <header><div class="brand">LANDFALL<span>64</span><small>QSOL-IMC · FIELD SOFTWARE DIVISION</small></div><div class="header-right"><span class="status">ALL SYSTEMS OFFLINE-READY</span><div class="toolbar"><button class="small" id="soundButton" aria-pressed="true" title="Toggle sound (M)">SOUND ON</button><button class="small" id="pauseButton" disabled title="Pause (P or Escape)">PAUSE</button><button class="small" id="fullButton" title="Fullscreen">⛶</button></div></div></header>
-  <div class="topline"><h1>OPERATION: LAST LIGHT</h1><span>FOUR MISSIONS / ONE ISLAND / NO QUARTER REQUIRED</span></div>
+  <div class="topline"><h1>OPERATION: LAST LIGHT</h1><span>FOUR MISSIONS + TWO BONUSES / NO QUARTER REQUIRED</span></div>
   <main class="layout">
     <div class="viewport" id="viewport">
       <canvas id="game" width="480" height="270" tabindex="0" aria-label="Landfall 64 game. Move with WASD, aim with the mouse, fire with left click or Space. E uses your special ability. P pauses.">Your browser needs HTML Canvas to play Landfall 64.</canvas>
@@ -26,8 +30,9 @@
     <aside class="console" aria-label="Mission console">
       <div class="intro-head"><span class="eyebrow" id="consoleTag">MISSION CONTROL</span><h2 id="consoleTitle">Ready, commander?</h2><p id="consoleText">An island fortress. A stranded crew. You have until the last light.</p></div>
       <div id="setupMode"><fieldset><legend>01 / RULES OF ENGAGEMENT</legend><div class="mode-options"><label><input type="radio" name="mode" value="easy" checked><span>EASY</span></label><label><input type="radio" name="mode" value="hard"><span>HARD</span></label></div></fieldset><p class="mode-note" id="modeNote">More armour. Slower fire. Stage checkpoints and unlimited continues.</p></div>
-      <div id="setupStage" class="rule"><label class="field-label" for="stageSelect">02 / DEPLOYMENT</label><select id="stageSelect"><option value="-1">FULL CAMPAIGN</option><option value="0">PRACTICE: SHORE ASSAULT</option><option value="1">PRACTICE: COURTYARD RESCUE</option><option value="2">PRACTICE: HELICOPTER ESCAPE</option><option value="3">PRACTICE: LAST LIGHT DUEL</option></select></div>
+      <div id="setupStage" class="rule"><label class="field-label" for="stageSelect">02 / DEPLOYMENT</label><select id="stageSelect"><option value="-1">FULL CAMPAIGN</option><option value="0">PRACTICE: SHORE ASSAULT</option><option value="1">PRACTICE: COURTYARD RESCUE</option><option value="2">PRACTICE: HELICOPTER ESCAPE</option><option value="3">PRACTICE: LAST LIGHT DUEL</option><option value="4">BONUS: SKYSHIELD</option><option value="5">BONUS: IRON HORIZON</option></select></div>
       <div id="activePanel" hidden><div class="mission-status"><div class="metric"><small id="healthLabel">ARMOUR</small><strong id="healthValue">8 / 8</strong></div><div class="metric"><small>SCORE</small><strong id="scoreValue">000000</strong></div><div class="metric"><small id="goalLabel">OBJECTIVE</small><strong id="goalValue">0 / 3</strong></div><div class="metric"><small>TRIES LEFT</small><strong id="livesValue">5</strong></div></div><div class="progress"><span id="progressValue"></span></div><p id="missionHint" style="margin-top:14px"></p><div class="rule" style="margin-top:16px"><p class="keyline" id="keyHelp"></p></div></div>
+      <div id="navalControls" hidden><label class="field-label" for="elevationDial">GUN ELEVATION</label><input type="range" id="elevationDial" min="5" max="50" step="0.5" value="18"><output id="elevationReadout" for="elevationDial">18.0° / 3600m</output></div>
       <div class="sound-options rule"><label><input type="checkbox" id="mathToggle" checked>MATH PULSE</label><label><input type="checkbox" id="voiceToggle" checked>VOICES</label></div>
       <div class="deploy" id="deployPanel"><button class="primary" id="deployButton">DEPLOY →</button><span class="under-deploy" id="bestText">NO INSTALL. NO ACCOUNT. JUST PLAY.</span></div>
       <button id="returnButton" class="small quiet" hidden>RETURN TO OPERATIONS</button>
@@ -35,7 +40,9 @@
   </main>
   <div class="touch-pad" id="touchPad" hidden><div class="dpad" aria-label="Movement"><button data-key="KeyW" aria-label="Up or jump">▲</button><button data-key="KeyA" aria-label="Left">◀</button><button data-key="KeyS" aria-label="Down or duck">▼</button><button data-key="KeyD" aria-label="Right">▶</button></div><div class="touch-actions"><button data-key="Space">FIRE</button><button data-key="KeyE" id="touchSpecial">SPECIAL</button></div></div>
   <nav class="mission-strip" aria-label="Practice a mission"><button class="mission-card" data-stage="0"><span class="number">01</span><span><b>SHORE ASSAULT</b><small>Advance. Take the gun.</small><em>→ MOVE + SHOOT</em></span></button><button class="mission-card" data-stage="1"><span class="number">02</span><span><b>COURTYARD RESCUE</b><small>Cover their way out.</small><em>→ AIM + PROTECT</em></span></button><button class="mission-card" data-stage="2"><span class="number">03</span><span><b>HELICOPTER ESCAPE</b><small>Get everyone airborne.</small><em>→ FLY + EXTRACT</em></span></button><button class="mission-card" data-stage="3"><span class="number">04</span><span><b>LAST LIGHT DUEL</b><small>Settle it at sundown.</small><em>→ DODGE + THROW</em></span></button></nav>
-  <footer class="foot"><div>WASD / ARROWS: MOVE &nbsp; MOUSE / SPACE: FIRE &nbsp; E: SPECIAL &nbsp; P: PAUSE<br><button class="small quiet" id="touchButton" aria-pressed="false" style="margin-top:8px">TOUCH CONTROLS</button> &nbsp; <a href="https://github.com/QSOLKCB/landfall-64" target="_blank" rel="noopener">SOURCE ↗</a></div><span>ORIGINAL PIXELS. COMPUTED WAVES.<br>BUILT SMALL. PLAYED LOUD. &nbsp; v1.0.0</span></footer>
+  <div class="bonus-heading eyebrow">BONUS OPERATIONS <small>THE FLEET STILL NEEDS YOU. AVAILABLE ANY TIME.</small></div>
+  <nav class="bonus-strip" aria-label="Bonus mini games"><button class="mission-card bonus-card" data-stage="4"><span class="number">B1</span><span><b>SKYSHIELD</b><small>Shipboard anti-aircraft defence.</small><em>→ LEAD + BURST</em></span></button><button class="mission-card bonus-card" data-stage="5"><span class="number">B2</span><span><b>IRON HORIZON</b><small>Find the range. Sink the fleet.</small><em>→ ELEVATE + CORRECT</em></span></button></nav>
+  <footer class="foot"><div>WASD / ARROWS: MOVE &nbsp; MOUSE / SPACE: FIRE &nbsp; E: SPECIAL &nbsp; P: PAUSE<br><button class="small quiet" id="touchButton" aria-pressed="false" style="margin-top:8px">TOUCH CONTROLS</button> &nbsp; <a href="https://github.com/QSOLKCB/landfall-64" target="_blank" rel="noopener">SOURCE ↗</a></div><span>ORIGINAL PIXELS. COMPUTED WAVES.<br>BUILT SMALL. PLAYED LOUD. &nbsp; v1.1.0</span></footer>
 </div>
 <script id="landfall-code">
 /* Landfall 64 — original game code, Apache-2.0. See ASSETS.md for generated art/audio. */
@@ -50,11 +57,39 @@ const MODES=Object.freeze({easy:{hp:8,lives:5,speed:62,damageGrace:1.1,rescue:8,
 const MISSIONS=[
  {name:'Shore assault',tag:'01 / ESTABLISH A FOOTHOLD',text:'Silence three sentry guns, destroy the bunker, then reach the amber gate.',keys:'<b>WASD / arrows</b> move<br><b>Mouse</b> aim · <b>Click / Space</b> fire<br><b>E</b> grenade · <b>P</b> pause',hint:'Sandbags stop bullets. Move through the gaps and fire from cover. Green figures are your squad.',special:'GRENADE'},
  {name:'Courtyard rescue',tag:'02 / LEAVE NO ONE BEHIND',text:'Cover the crew crossing to the right. Clear mines, vehicles and rooftop attackers.',keys:'<b>Mouse / arrows</b> aim<br><b>Click / Space</b> covering fire<br><b>E</b> rally the crew · <b>P</b> pause',hint:'Gold figures are evacuees. Friendly fire is disabled. Shoot flashing hazards before they reach the crew.',special:'RALLY'},
- {name:'Helicopter escape',tag:'03 / RIDE THE SKYBRIDGE',text:'Hover low over both amber pads to collect the crew, then fly to the offshore carrier.',keys:'<b>WASD / arrows</b> fly<br><b>Mouse</b> aim · <b>Click / Space</b> fire<br><b>E</b> defensive flare · <b>P</b> pause',hint:'Hover just above a pad for one second. Watch your altitude at the rock spires. The cyan beacon is home.',special:'FLARE'},
- {name:'Last light duel',tag:'04 / THE LAST WORD',text:'Defeat the fortress commander. Throw between guards; jump low shots and duck high shots.',keys:'<b>A / D</b> move · <b>W</b> jump · <b>S</b> duck<br><b>Click / Space</b> throw<br><b>E</b> shield · <b>P</b> pause',hint:'Watch the warning: LOW means jump, HIGH means duck. The commander cannot block while recovering.',special:'SHIELD'}
+ {name:'Helicopter escape',tag:'03 / RIDE THE SKYBRIDGE',text:'Land or hover over both amber pads to collect the crew, then return to the offshore carrier.',keys:'<b>WASD / arrows</b> fly · <b>S / Down</b> land<br><b>Mouse</b> aim · <b>Click / Space</b> fire<br><b>E</b> defensive flare · <b>P</b> pause',hint:'Follow the amber pad arrows. Hold S / Down to land, then stop moving to board the crew. The cyan carrier is home.',special:'FLARE'},
+ {name:'Last light duel',tag:'04 / THE LAST WORD',text:'Defeat the fortress commander. Throw between guards; jump low shots and duck high shots.',keys:'<b>A / D</b> move · <b>W</b> jump · <b>S</b> duck<br><b>Click / Space</b> throw<br><b>E</b> shield · <b>P</b> pause',hint:'Watch the warning: LOW means jump, HIGH means duck. The commander cannot block while recovering.',special:'SHIELD'},
+ {name:'Skyshield',tag:'B1 / FLEET AIR DEFENCE',text:'Man the deck guns, lead incoming aircraft and protect the fleet until the raid ends.',keys:'<b>Mouse / WASD / arrows</b> aim<br><b>Click / Space</b> fire · six ready shells<br><b>E</b> flak barrage · <b>P</b> pause',hint:'Lead the planes. Use short bursts; shells refill automatically. Shoot falling bombs. Scouts earn extra points.',special:'BARRAGE'},
+ {name:'Iron horizon',tag:'B2 / NAVAL RANGE DUEL',text:'Align the heavy guns with a ship, set the elevation, and use LONG / SHORT reports to find its range.',keys:'<b>Mouse / A D</b> bearing<br><b>W / S</b> elevation · <b>Shift</b> fine aim<br><b>Click / Space</b> fire · <b>E</b> smoke',hint:'SHORT: raise elevation. LONG: lower it. One degree = 200m. The slider supports mouse and touch. Use smoke against incoming salvos.',special:'SMOKE'}
 ];
 const WALLS=[{x:55,y:173,w:86,h:8},{x:204,y:173,w:60,h:8},{x:337,y:173,w:84,h:8},{x:107,y:111,w:81,h:8},{x:292,y:111,w:82,h:8}];
 const SPIRES=[{x:478,y:149,w:36,h:81},{x:1005,y:157,w:34,h:73},{x:1516,y:132,w:40,h:98}];
+// Return the first contact along a projectile's travelled segment, including its start.
+function segmentBoxHit(s,r){
+ const dx=s.x-s.px,dy=s.y-s.py;let near=0,far=1;
+ if(Math.abs(dx)<1e-9){if(s.px<r.x||s.px>r.x+r.w)return null;}
+ else{const a=(r.x-s.px)/dx,b=(r.x+r.w-s.px)/dx;near=Math.max(near,Math.min(a,b));far=Math.min(far,Math.max(a,b));}
+ if(Math.abs(dy)<1e-9){if(s.py<r.y||s.py>r.y+r.h)return null;}
+ else{const a=(r.y-s.py)/dy,b=(r.y+r.h-s.py)/dy;near=Math.max(near,Math.min(a,b));far=Math.min(far,Math.max(a,b));}
+ return near<=far?near:null;
+}
+function segmentCircleHit(s,c,r){
+ const dx=s.x-s.px,dy=s.y-s.py,fx=s.px-c.x,fy=s.py-c.y,a=dx*dx+dy*dy,b=fx*dx+fy*dy,d=fx*fx+fy*fy-r*r;
+ if(d<=0)return 0;if(a===0)return null;const discriminant=b*b-a*d;if(discriminant<0)return null;
+ const t=(-b-Math.sqrt(discriminant))/a;return t>=0&&t<=1?t:null;
+}
+function rescueImpact(s,enemies,hazards){
+ let hit=null;
+ for(const e of enemies){
+  if(e.dead)continue;
+  // person() anchors at the feet; include the full 1.1-scale rooftop sprite.
+  // vehicle() extends above its origin too. Keep a small pixel-aim allowance.
+  const r=e.type==='roof'?{x:e.x-5,y:e.y-17,w:15,h:22}:{x:e.x-17,y:e.y-16,w:32,h:22};
+  const t=segmentBoxHit(s,r);if(t!==null&&(!hit||t<hit.t))hit={target:e,t,hazard:false};
+ }
+ for(const h of hazards){if(h.hp<=0)continue;const t=segmentCircleHit(s,h,10);if(t!==null&&(!hit||t<hit.t))hit={target:h,t,hazard:true};}
+ return hit;
+}
 function mergeBests(...sources){const result={easy:0,hard:0};for(const source of sources)if(source&&typeof source==='object')for(const mode of ['easy','hard'])if(Number.isFinite(source[mode]))result[mode]=Math.max(result[mode],source[mode]);return result;}
 function recordBest(current,mode,score,storage){let result=mergeBests(current,{[mode]:score});try{result=mergeBests(result,JSON.parse(storage.getItem('landfall64-best')||'{}'));storage.setItem('landfall64-best',JSON.stringify(result));}catch(_){}return result;}
 function voiceSamples(team,variant=0,rate=11025){
@@ -84,7 +119,7 @@ function mathSamples(rate=16000){
 }
 class Game{
  constructor(mode='easy',stage=0,practice=false){
-  this.mode=mode;this.cfg=MODES[mode];this.practice=practice;this.score=0;this.lives=this.cfg.lives;this.rescued=this.cfg.rescue;this.elapsed=0;this.checkpoint=null;this.status='brief';this.events=[];this.load(stage);
+  this.mode=mode;this.cfg=MODES[mode];this.practice=practice||stage>=4;this.score=0;this.lives=this.cfg.lives;this.rescued=this.cfg.rescue;this.elapsed=0;this.checkpoint=null;this.status='brief';this.events=[];this.load(stage);
  }
  load(stage,retry=false){
   if(!retry)this.checkpoint={score:this.score,rescued:this.rescued,elapsed:this.elapsed};
@@ -95,6 +130,8 @@ class Game{
   if(stage===1){this.player={x:240,y:248,vx:0,vy:0};this.spawned=0;this.saved=0;this.lost=0;this.nextCivilian=.5;this.nextHazard=2;this.rally=0;this.aim={x:240,y:104};}
   if(stage===2){this.player={x:80,y:102,vx:0,vy:0};this.cargo=0;this.pads=[{x:702,y:222,count:Math.ceil(this.rescued/2),progress:0,done:false},{x:1280,y:222,count:Math.floor(this.rescued/2),progress:0,done:false}];this.enemies=[330,882,1430,1740].map((x,i)=>({x,y:215,hp:4,max:4,type:'tank',timer:2+i*.7}));}
   if(stage===3){this.player={x:100,y:201,vx:0,vy:0,duck:false};this.boss={x:383,y:201,hp:this.cfg.boss,max:this.cfg.boss,phase:'guard',timer:1.2,attack:0,warning:'',target:100};}
+  if(stage===4){this.player={x:240,y:244,vx:0,vy:0};this.aim={x:240,y:110};this.rounds=6;this.spawned=0;this.planesDown=0;this.raidTotal=this.mode==='easy'?12:18;this.nextPlane=.7;}
+  if(stage===5){this.player={x:240,y:244,vx:0,vy:0};this.bearing=240;this.elevation=18;this.shipsDown=0;this.feedback='ALIGN A SHIP · FIRE A RANGING SHOT';this.report=null;this.salvos=[];const total=this.mode==='easy'?4:6;this.enemies=Array.from({length:total},(_,i)=>{const range=Math.round((2700+i*950+this.rng()*350)/100)*100;return {type:'ship',x:55+i*370/(total-1),y:110+(9000-range)/100,range,hp:this.mode==='easy'?2:3,max:this.mode==='easy'?2:3,timer:(this.mode==='easy'?16:12)+i*2,salvos:0};});}
  }
  begin(){if(this.status==='brief')this.status='play';}
  event(type,data={}){this.events.push({type,...data});}
@@ -105,8 +142,8 @@ class Game{
  finish(){if(this.status!=='play')return;this.status='clear';this.completed=true;this.score+=500+this.hp*50;if(this.stage===1)this.rescued=this.saved;this.event('clear');}
  advance(){if(this.status!=='clear')return false;if(this.stage===3||this.practice){this.status='won';return false;}this.load(this.stage+1);return true;}
  shoot(x,y,tx,ty,team='player',speed=300,extra={}){const d=Math.hypot(tx-x,ty-y)||1;this.shots.push({x,y,px:x,py:y,vx:(tx-x)/d*speed,vy:(ty-y)/d*speed,team,life:5,gravity:0,...extra});}
- kill(e){if(e.dead)return;e.dead=true;this.score+=e.type==='bunker'?600:e.type==='tank'?180:100;this.burst(e.x,e.y,'gold',16);this.event('blast');this.event('voice',{team:'enemy'});}
- target(input){if(input.aim)return {x:input.aim.x+this.camera,y:input.aim.y};if(this.stage===1)return this.aim;if(this.stage===3)return {x:this.boss.x,y:this.boss.y-10};const live=this.enemies.filter(e=>!e.dead&&(e.type!=='bunker'||this.enemies.filter(t=>t.type==='turret').every(t=>t.dead)));live.sort((a,b)=>dist(a,this.player)-dist(b,this.player));return live.length?{x:live[0].x,y:live[0].y}:{x:this.player.x+(this.stage===2?140:0),y:this.player.y-(this.stage===2?0:140)};}
+ kill(e){if(e.dead)return;e.dead=true;this.score+=e.type==='bunker'||e.type==='ship'?600:e.type==='scout'?400:e.type==='tank'?180:e.type==='plane'?150:100;if(this.stage===4)this.planesDown++;if(this.stage===5)this.shipsDown++;this.burst(e.x,e.y,'gold',16);this.event('blast');this.event('voice',{team:'enemy'});}
+ target(input){if(input.aim)return {x:input.aim.x+this.camera,y:input.aim.y};if(this.stage===1||this.stage===4)return this.aim;if(this.stage===3)return {x:this.boss.x,y:this.boss.y-10};const live=this.enemies.filter(e=>!e.dead&&(e.type!=='bunker'||this.enemies.filter(t=>t.type==='turret').every(t=>t.dead)));live.sort((a,b)=>dist(a,this.player)-dist(b,this.player));return live.length?{x:live[0].x,y:live[0].y}:{x:this.player.x+(this.stage===2?140:0),y:this.player.y-(this.stage===2?0:140)};}
  ability(input){
   if(!input.special||this.special>0)return;
   this.special=this.mode==='easy'?7:10;this.event('special');
@@ -114,6 +151,8 @@ class Game{
   if(this.stage===1){this.rally=3;this.burst(240,188,'green',20);}
   if(this.stage===2){this.shots=this.shots.filter(s=>s.team==='player');this.shield=2.5;this.burst(this.player.x,this.player.y,'green',22);}
   if(this.stage===3)this.shield=1.4;
+  if(this.stage===4){this.rounds=6;this.shield=2;for(const h of this.hazards)h.hp=0;for(const e of this.enemies)if(!e.dead&&e.y>110){e.hp--;if(e.hp<=0)this.kill(e);}this.burst(240,126,'gold',30);}
+  if(this.stage===5){this.shield=3;this.hazards=[];this.feedback='SMOKE SCREEN · INCOMING SALVOS DISRUPTED';}
  }
  update(dt,input={}){
   if(this.status!=='play')return;
@@ -124,8 +163,10 @@ class Game{
   if(this.stage===1)this.rescue(dt,input);
   if(this.stage===2)this.flight(dt,input);
   if(this.stage===3)this.duel(dt,input);
+  if(this.stage===4)this.skyshield(dt,input);
+  if(this.stage===5)this.horizon(dt,input);
   if(this.status!=='play')return;
-  if(input.fire&&this.cooldown<=0){
+  if(input.fire&&this.cooldown<=0&&this.stage<4){
    const p=this.player,t=this.target(input);this.cooldown=this.stage===3?.42:.145;
    if(this.stage===3){if(!p.duck){const duration=clamp(Math.abs(t.x-p.x)/270,.45,1.4),gravity=100;this.shots.push({x:p.x+7,y:p.y-12,px:p.x+7,py:p.y-12,vx:(t.x-p.x-7)/duration,vy:(t.y-(p.y-12)-.5*gravity*duration*duration)/duration,gravity,team:'player',life:3});this.event('throw');}}
    else{this.shoot(p.x,p.y-(this.stage===1?8:5),t.x,t.y,'player',this.stage===2?350:390);this.event('shot');}
@@ -154,14 +195,21 @@ class Game{
   this.hazards=this.hazards.filter(h=>h.life>0&&h.hp>0);this.enemies=this.enemies.filter(e=>!e.dead);this.civilians=this.civilians.filter(c=>!c.done);
   if(this.saved+this.lost>=this.cfg.rescue){if(this.saved>=this.cfg.required)this.finish();else this.fail('Too few of the crew made it across. Clear the hazards and try the courtyard again.');}
  }
+ flightGuide(){
+  let pad=null;for(const p of this.pads)if(!p.done&&(!pad||Math.abs(p.x-this.player.x)<Math.abs(pad.x-this.player.x)))pad=p;
+  const x=pad?pad.x:1920,delta=x-this.player.x;
+  return {pad,index:pad?this.pads.indexOf(pad)+1:0,x,direction:Math.abs(delta)<=30?0:Math.sign(delta),distance:Math.round(Math.abs(delta))};
+ }
  flight(dt,input){
   const p=this.player,speed=this.mode==='easy'?105:116;let dx=input.dx||0,dy=input.dy||0;const len=Math.max(1,Math.hypot(dx,dy));p.vx+=(dx/len*speed-p.vx)*Math.min(1,dt*9);p.vy+=(dy/len*speed-p.vy)*Math.min(1,dt*9);p.x=clamp(p.x+p.vx*dt,22,1962);p.y=clamp(p.y+p.vy*dt,44,222);
   for(const r of SPIRES)if(inside(p,r,10)){this.damage();p.x=p.vx>0?r.x-11:r.x+r.w+11;p.vx=0;}
+  const landingPad=this.pads.find(pad=>Math.abs(p.x-pad.x)<=30),landingY=landingPad?landingPad.y-9:p.x>=1850?205:null;
+  this.landed=landingY!==null&&p.y>=landingY;if(this.landed){p.y=landingY;p.vy=0;}
   if(p.y>=220){this.damage();p.y=210;p.vy=0;}
   this.camera=clamp(p.x-160,0,1520);
   for(const e of this.enemies){if(e.dead||Math.abs(e.x-p.x)>340)continue;e.timer-=dt;if(e.timer<=0){e.timer=this.mode==='easy'?3.2:1.8;this.shoot(e.x,e.y-9,p.x,p.y,'enemy',this.mode==='easy'?66:105);}}
-  for(const pad of this.pads){if(pad.done)continue;if(Math.abs(p.x-pad.x)<28&&p.y>181&&p.y<215&&Math.abs(p.vx)<40){pad.progress+=dt;if(pad.progress>=1.1){pad.done=true;this.cargo+=pad.count;this.hp=Math.min(this.cfg.hp,this.hp+1);this.score+=pad.count*120;this.event('rescue');this.burst(pad.x,205,'green',14);}}else pad.progress=Math.max(0,pad.progress-dt*.5);}
-  if(this.pads.every(p=>p.done)&&p.x>1890&&p.y>65&&p.y<200)this.finish();
+  for(const pad of this.pads){if(pad.done)continue;if(Math.abs(p.x-pad.x)<=30&&p.y>181&&p.y<215&&Math.abs(p.vx)<40){pad.progress+=dt;if(pad.progress>=1.1){pad.done=true;this.cargo+=pad.count;this.hp=Math.min(this.cfg.hp,this.hp+1);this.score+=pad.count*120;this.event('rescue');this.burst(pad.x,205,'green',14);}}else pad.progress=Math.max(0,pad.progress-dt*.5);}
+  if(this.pads.every(p=>p.done)&&this.cargo===this.rescued&&p.x>1890&&p.y>65&&p.y<=205)this.finish();
  }
  duel(dt,input){
   const p=this.player,b=this.boss;p.duck=!!input.duck&&p.y>=200;p.x=clamp(p.x+(input.dx||0)*(p.duck?36:76)*dt,30,181);
@@ -173,6 +221,37 @@ class Game{
   else if(b.phase==='recover'&&b.timer<=0){b.phase='guard';b.timer=this.mode==='easy'?.7:1.05;b.warning='';}
   if(b.hp<=0){this.event('voice',{team:'boss'});this.burst(b.x,b.y-10,'gold',30);this.finish();}
  }
+ skyshield(dt,input){
+  if(!input.aim){this.aim.x=clamp(this.aim.x+(input.dx||0)*175*dt,10,470);this.aim.y=clamp(this.aim.y+(input.dy||0)*175*dt,42,222);}
+  this.rounds=Math.min(6,this.rounds+dt*(this.mode==='easy'?2.5:2));this.nextPlane-=dt;
+  if(this.nextPlane<=0&&this.spawned<this.raidTotal){
+   const scout=this.spawned%5===4;this.nextPlane=this.mode==='easy'?1.9:1.45;
+   this.enemies.push(scout?{type:'scout',x:-18,y:63,vx:63,hp:1,max:1,r:8}:{type:'plane',x:240,y:65,lane:60+this.rng()*360,z:.06,phase:this.rng()*6,hp:this.mode==='easy'?1:2,max:this.mode==='easy'?1:2,r:6,dropped:false});this.spawned++;
+  }
+  for(const e of this.enemies){if(e.dead)continue;if(e.type==='scout'){e.x+=e.vx*dt;if(e.x>500)e.dead=true;continue;}e.z+=dt*(this.mode==='easy'?.115:.155);e.r=5+e.z*8;e.x=240+(e.lane-240)*(.45+e.z*.8)+Math.sin(this.time*2+e.phase)*e.z*8;e.y=60+e.z*110;
+   if(e.z>.94&&!e.dropped){e.dropped=true;this.hazards.push({type:'bomb',x:e.x,y:e.y,vx:(240-e.x)/1.7,vy:36,hp:1});}
+   if(e.z>1.3)e.dead=true;
+  }
+  for(const h of this.hazards){if(h.hp<=0)continue;h.vy+=28*dt;h.x+=h.vx*dt;h.y+=h.vy*dt;if(h.y>=234){h.hp=0;this.damage();this.burst(h.x,235,'red',10);}}
+  this.hazards=this.hazards.filter(h=>h.hp>0);this.enemies=this.enemies.filter(e=>!e.dead);
+  if(this.status==='play'&&input.fire&&this.cooldown<=0&&this.rounds>=1){const t=this.target(input);this.rounds-=1;this.cooldown=.15;this.shoot(240,235,t.x,t.y,'player',360);this.event('shot');}
+  if(this.spawned===this.raidTotal&&!this.enemies.length&&!this.hazards.length)this.finish();
+ }
+ horizon(dt,input){
+  this.bearing=clamp(input.aim?input.aim.x:this.bearing+(input.dx||0)*90*dt,20,460);
+  this.elevation=clamp(this.elevation-(input.dy||0)*(input.cover?1:7)*dt,5,50);
+  if(input.fire&&this.cooldown<=0){this.cooldown=this.mode==='easy'?1.2:1.5;this.salvos.push({bearing:this.bearing,range:this.elevation*200,elevation:this.elevation,life:1,total:1});this.event('blast');this.feedback='SALVO AWAY · AWAITING SPLASH REPORT';this.report=null;}
+  for(const s of this.salvos){s.life-=dt;if(s.life>0)continue;let target=null;for(const e of this.enemies)if(!e.dead&&Math.abs(e.x-s.bearing)<=24&&(!target||Math.abs(e.x-s.bearing)<Math.abs(target.x-s.bearing)))target=e;
+   if(!target){this.feedback='BEARING OFF · ALIGN WITH A SHIP';this.report={kind:'bearing'};this.burst(s.bearing,178,'foam',8);continue;}
+   const delta=s.range-target.range;this.report={kind:'range',delta,target:target.x};
+   if(Math.abs(delta)<=(this.mode==='easy'?160:100)){target.hp--;this.score+=75;this.feedback='DIRECT HIT · '+(target.hp>0?'FIRE AGAIN':'TARGET SUNK');this.burst(target.x,target.y,'gold',14);if(target.hp<=0)this.kill(target);}
+   else{this.feedback=`${delta>0?'LONG':'SHORT'} ${Math.round(Math.abs(delta))}m · ${delta>0?'LOWER':'RAISE'} ${Math.abs(delta/200).toFixed(1)}°`;this.burst(target.x,target.y+(delta>0?-14:14),'foam',9);}
+  }
+  this.salvos=this.salvos.filter(s=>s.life>0);
+  for(const e of this.enemies){if(e.dead)continue;e.timer-=dt;if(e.timer<=0){e.salvos++;e.timer=this.mode==='easy'?12:10;if(e.salvos===1&&this.mode==='easy')this.burst(40+this.rng()*400,210,'foam',5);else this.hazards.push({type:'incoming',x:e.x,y:e.y,life:1.6,total:1.6,hp:1});}}
+  for(const h of this.hazards){h.life-=dt;if(h.life<=0){this.damage();this.burst(240,237,'red',14);}}
+  this.hazards=this.hazards.filter(h=>h.life>0);if(this.enemies.every(e=>e.dead))this.finish();
+ }
  projectiles(dt){
   const p=this.player;
   for(const s of this.shots){if(this.status!=='play')break;if(s.life<=0)continue;s.px=s.x;s.py=s.y;s.vy+=s.gravity*dt;s.x+=s.vx*dt;s.y+=s.vy*dt;s.life-=dt;
@@ -182,9 +261,19 @@ class Game{
     if(hit){s.life=0;this.damage();}
    }else if(this.stage===3){
     const b=this.boss;if(b.hp>0&&Math.abs(s.x-b.x)<8&&s.y>b.y-24&&s.y<b.y+2){s.life=0;if(b.phase==='guard'){this.burst(s.x,s.y,'green',4);this.event('block');}else{b.hp--;this.score+=60;this.burst(s.x,s.y,'gold',6);this.event('hitEnemy');if(b.hp===0){this.event('voice',{team:'boss'});this.burst(b.x,b.y-10,'gold',30);this.finish();}}}
+   }else if(this.stage===4){
+    let hit=null;for(const e of this.enemies){if(e.dead)continue;const r=e.r||8,t=segmentBoxHit(s,{x:e.x-r*1.5,y:e.y-r*.55,w:r*3,h:r*1.1});if(t!==null&&(!hit||t<hit.t))hit={target:e,t,hazard:false};}
+    for(const h of this.hazards){if(h.hp<=0)continue;const t=segmentCircleHit(s,h,7);if(t!==null&&(!hit||t<hit.t))hit={target:h,t,hazard:true};}
+    if(hit){s.life=0;if(hit.hazard){hit.target.hp=0;this.score+=60;this.burst(hit.target.x,hit.target.y,'gold',7);}else{hit.target.hp--;this.burst(s.x,s.y,'gold',4);if(hit.target.hp<=0)this.kill(hit.target);}}
+   }else if(this.stage===1){
+    const hit=rescueImpact(s,this.enemies,this.hazards);
+    if(hit){
+     s.x=s.px+(s.x-s.px)*hit.t;s.y=s.py+(s.y-s.py)*hit.t;s.life=0;
+     if(hit.hazard){hit.target.hp=0;this.score+=50;this.burst(s.x,s.y,'gold',7);}
+     else{hit.target.hp--;this.burst(s.x,s.y,'gold',3);if(hit.target.hp<=0)this.kill(hit.target);}
+    }
    }else{
     for(const e of this.enemies){if(e.dead)continue;const radius=e.type==='bunker'?22:e.type==='tank'||e.type==='buggy'?13:9;if(Math.hypot(s.x-e.x,s.y-e.y)<radius){s.life=0;if(this.stage===0&&e.type==='bunker'&&this.enemies.some(e=>e.type==='turret'&&!e.dead)){this.burst(s.x,s.y,'green',3);}else{e.hp--;this.burst(s.x,s.y,'gold',3);if(e.hp<=0)this.kill(e);}break;}}
-    if(this.stage===1&&s.life>0)for(const h of this.hazards)if(h.hp>0&&Math.hypot(s.x-h.x,s.y-h.y)<10){h.hp=0;s.life=0;this.score+=50;this.burst(h.x,h.y,'gold',7);break;}
    }
   }
   this.shots=this.shots.filter(s=>s.life>0&&s.x>-40&&s.x<(this.stage===2?2040:520)&&s.y>-70&&s.y<300);
@@ -260,12 +349,17 @@ function drawFlight(g){
  const cam=g.camera;rect(0,0,W,H,'#314c55');clouds(g.time,cam);poly([[0,173],[55,125],[110,169],[186,114],[251,176],[338,132],[405,168],[480,120],[480,230],[0,230]],'#28454c');rect(0,225,W,45,'sea');for(let x=0;x<480;x+=31)rect((x-cam*.3+480)%480,238+Math.sin(x)*4,13,1,'foam');
  ctx.save();ctx.translate(-Math.round(cam),0);rect(0,221,1780,8,'darkSand');rect(0,229,1780,41,'shadow');
  for(const r of SPIRES){poly([[r.x-10,226],[r.x,r.y+8],[r.x+12,r.y],[r.x+r.w,r.y+9],[r.x+r.w+7,226]],'shadow');rect(r.x+8,r.y+6,r.w-11,3,'wall');rect(r.x+12,r.y-3,3,3,Math.floor(g.time*3)%2?'red':'gold');}
- for(const pad of g.pads){rect(pad.x-34,219,68,4,pad.done?'green':'gold');rect(pad.x-20,221,40,5,'wall');text(pad.done?'ABOARD':`HOVER ↓  ${pad.count}`,pad.x,235,pad.done?'green':'gold',6,'center');if(!pad.done){for(let i=0;i<Math.min(pad.count,6);i++)person(pad.x-20+i*8,216,'gold',0,false,.55);rect(pad.x-25,198,50,2,'shadow');rect(pad.x-25,198,pad.progress/1.1*50,2,'gold');line(pad.x-28,185,pad.x-28,214,'gold');line(pad.x+28,185,pad.x+28,214,'gold');}}
+ for(const pad of g.pads){rect(pad.x-34,pad.y-3,68,4,pad.done?'green':'gold');rect(pad.x-20,pad.y-1,40,5,'wall');text(pad.done?'ABOARD':`LAND / HOVER ↓ ${pad.count}`,pad.x,pad.y+13,pad.done?'green':'gold',6,'center');if(!pad.done){for(let i=0;i<Math.min(pad.count,6);i++)person(pad.x-20+i*8,pad.y-6,'gold',0,false,.55);rect(pad.x-25,pad.y-24,50,2,'shadow');rect(pad.x-25,pad.y-24,pad.progress/1.1*50,2,'gold');line(pad.x-28,pad.y-37,pad.x-28,pad.y-8,'gold');line(pad.x+28,pad.y-37,pad.x+28,pad.y-8,'gold');}}
  for(const e of g.enemies)if(!e.dead){vehicle(e);if(e.timer<.8&&Math.abs(e.x-g.player.x)<340)text('!',e.x,e.y-25,'gold',8,'center');}
  rect(1840,211,160,18,'wall');poly([[1832,212],[2000,212],[2000,224],[1850,228]],'shadow');rect(1908,186,36,25,'muted');rect(1912,191,28,7,'sea');line(1925,185,1925,160,'ink');rect(1926,161,17,8,'green');text('HOME →',1910,148,'green',8,'center');
  if(g.invulnerable<=0||Math.floor(g.time*12)%2)heli(g.player.x,g.player.y,g.time);if(g.shield>0){ctx.strokeStyle=C.green;ctx.beginPath();ctx.arc(g.player.x,g.player.y,23,0,Math.PI*2);ctx.stroke();}
  ctx.restore();
- const pad=g.pads.find(p=>!p.done);text(pad?`PAD ${g.pads.indexOf(pad)+1} → ${Math.max(0,Math.round(pad.x-g.player.x))}m`:'ALL ABOARD · CARRIER →',W-12,49,'gold',6,'right');
+ const guide=g.flightGuide(),arrow=guide.direction<0?'←':guide.direction>0?'→':'↓';
+ const cue=guide.pad?(guide.direction===0?`PAD ${guide.index} · ${guide.pad.progress>0?'BOARDING '+Math.min(100,Math.floor(guide.pad.progress/1.1*100))+'%':'DESCEND TO LAND ↓'}`:`PAD ${guide.index} ${arrow} ${guide.distance}m`):`ALL ABOARD · CARRIER ${arrow} ${guide.distance}m`;
+ text(cue,W-12,49,'gold',6,'right');
+ if(guide.pad&&(guide.x<cam||guide.x>cam+W))text(`${arrow} PAD ${guide.index}`,guide.direction<0?12:W-12,75,'gold',7,guide.direction<0?'left':'right');
+ if(guide.pad&&g.player.x>1820)text('CREW STILL ASHORE · FOLLOW THE AMBER PAD ARROW',240,61,'gold',6,'center');
+ if(g.landed)text('ON DECK',g.player.x-cam,g.player.y-18,'green',5,'center');
 }
 function drawDuel(g){
  rect(0,0,W,H,'#4a5255');rect(0,76,W,46,'#8d7a67');rect(0,122,W,55,'#c29a72');rect(0,177,W,93,'sea');rect(335,82,31,23,'gold');poly([[0,162],[80,115],[142,160],[220,134],[286,169],[362,120],[480,157],[480,185],[0,185]],'#3c5252');
@@ -278,32 +372,75 @@ function drawDuel(g){
  if(g.shield>0){line(p.x-12,p.y-25,p.x-12,p.y,'green',2);line(p.x+12,p.y-25,p.x+12,p.y,'green',2);}
  text('YOU',p.x,224,'green',6,'center');text('JUMP LOW · DUCK HIGH',240,253,'muted',6,'center');
 }
+function fleetSea(g){
+ rect(0,0,W,H,'#466572');rect(0,86,W,184,'sea');clouds(g.time,0);line(0,87,W,87,'foam');
+ for(let i=0;i<8;i++){const y=101+i*i*2.5;for(let x=0;x<480;x+=53)rect((x+i*17+g.time*(i+1))%510-20,y,9+i*2,1,i%2?'deep':'foam');}
+ poly([[0,85],[25,67],[58,80],[94,62],[132,85]],'shadow');rect(0,224,W,46,'shadow');rect(0,224,W,3,'wall');
+ for(let x=15;x<480;x+=48){line(x,227,x-25,262,'wall');rect(x,219,2,6,'ink');}line(0,220,480,220,'muted');
+}
+function deckGuns(target,ready){
+ rect(193,240,94,22,'wall');rect(208,232,64,14,'muted');rect(220,231,40,7,'green');
+ const a=Math.atan2(target.y-237,target.x-240);for(const x of [236,244])line(x,237,x+Math.cos(a)*30,237+Math.sin(a)*30,ready?'ink':'wall',3);
+ rect(236,242,8,11,'shadow');
+}
+function drawSkyshield(g){
+ fleetSea(g);for(const e of g.enemies){if(e.dead)continue;const r=e.r||8;
+  poly([[e.x-r*1.5,e.y],[e.x-r*.3,e.y-r*.2],[e.x,e.y-r*.5],[e.x+r*.3,e.y-r*.2],[e.x+r*1.5,e.y],[e.x+r*.35,e.y+r*.12],[e.x+r*.15,e.y+r*.5],[e.x-r*.15,e.y+r*.5],[e.x-r*.35,e.y+r*.12]],e.type==='scout'?'gold':'red');
+  rect(e.x-1,e.y-r*.3,2,r*.8,'ink');if(e.type==='scout')text('SCOUT +400',e.x,e.y-12,'gold',5,'center');
+  if(e.type==='plane'&&e.z>.76&&!e.dropped&&Math.floor(g.time*7)%2)text('BOMB!',e.x,e.y-r-4,'gold',6,'center');
+ }
+ for(const h of g.hazards){if(h.hp<=0)continue;line(h.x,h.y-12,h.x,h.y-6,'muted');rect(h.x-2,h.y-4,4,8,'gold');}
+ deckGuns(g.target(mouse.active?{aim:mouse}:{}),g.rounds>=1);
+ text(`RAID ${g.spawned}/${g.raidTotal} · AIRCRAFT DOWN ${g.planesDown}`,12,43,'gold',6);
+ text('AUTOLOADER',12,204,'muted',5);for(let i=0;i<6;i++)rect(12+i*9,208,6,9,g.rounds>=i+1?'gold':'shadow');
+ text(g.rounds<1?'REPLENISHING…':'BURST FIRE READY',12,233,g.rounds<1?'red':'green',5);
+ if(g.shield>0)text('BARRAGE COVER',466,209,'green',6,'right');
+}
+function drawHorizon(g){
+ fleetSea(g);
+ for(let i=0;i<g.enemies.length;i++){const e=g.enemies[i];if(e.dead){rect(e.x-12,e.y+2,24,2,'shadow');continue;}const scale=.65+(9000-e.range)/15000;ctx.save();ctx.translate(Math.round(e.x),Math.round(e.y));ctx.scale(scale,scale);
+  poly([[-28,0],[28,0],[21,8],[-21,8]],'shadow');rect(-18,-6,35,7,'wall');rect(-6,-15,12,10,'red');rect(-2,-23,2,10,'ink');rect(0,-23,10,5,'red');rect(-20,-10,12,3,'muted');rect(11,-9,13,3,'muted');ctx.restore();
+  rect(e.x-17,e.y+12,34,2,'shadow');rect(e.x-17,e.y+12,34*e.hp/e.max,2,'red');text(`HULL ${i+1}`,e.x,e.y+21,'muted',5,'center');if(e.timer<1)text('SALVO!',e.x,e.y-30,'red',5,'center');
+ }
+ const rangeY=110+(9000-g.elevation*200)/100;line(g.bearing,93,g.bearing,210,'#efb34e66');cross(g.bearing,rangeY);
+ for(const s of g.salvos){const u=1-s.life/s.total;rect(240+(s.bearing-240)*u,235+(110+(9000-s.range)/100-235)*u-Math.sin(u*Math.PI)*45,3,3,'gold');}
+ for(const h of g.hazards){const u=1-h.life/h.total;rect(h.x+(240-h.x)*u,h.y+(237-h.y)*u-Math.sin(u*Math.PI)*25,3,3,'red');}
+ deckGuns({x:g.bearing,y:clamp(225-g.elevation*3,60,210)},g.cooldown<=0);text(`${g.elevation.toFixed(1)}° · ${Math.round(g.elevation*200)}m`,12,43,'gold',7);
+ text(g.cooldown>0?`RELOAD ${g.cooldown.toFixed(1)}s`:'GUNS READY',466,43,g.cooldown>0?'muted':'green',6,'right');
+ rect(9,200,462,12,'bg');text(g.feedback,240,208,'gold',6,'center');
+ if(g.shield>0){for(let x=0;x<W;x+=24)rect(x,215+Math.sin(x)*3,35,8,'#8aa69a');text('SMOKE COVER',240,221,'ink',5,'center');}
+}
 function hud(g){
- rect(0,0,W,25,'bg');rect(0,24,W,1,'#49615c');text(`${String(g.stage+1).padStart(2,'0')} ${MISSIONS[g.stage].name.toUpperCase()}`,10,10,'gold',6);text(g.mode.toUpperCase()+(g.practice?' / PRACTICE':''),10,20,'muted',5);
+ rect(0,0,W,25,'bg');rect(0,24,W,1,'#49615c');text(`${g.stage>=4?'B'+(g.stage-3):String(g.stage+1).padStart(2,'0')} ${MISSIONS[g.stage].name.toUpperCase()}`,10,10,'gold',6);text(g.mode.toUpperCase()+(g.stage>=4?' / BONUS':g.practice?' / PRACTICE':''),10,20,'muted',5);
  for(let i=0;i<g.cfg.hp;i++)rect(193+i*6,8,4,8,i<g.hp?'green':'shadow');
  text(String(g.score).padStart(6,'0'),337,12,'ink',8,'right');text(`E ${g.special>0?Math.ceil(g.special)+'s':'READY'}`,375,12,g.special>0?'muted':'gold',6);text(`${Math.floor(g.elapsed/60)}:${String(Math.floor(g.elapsed%60)).padStart(2,'0')}`,470,12,'muted',6,'right');
  if(g.stage===1)text(`SAFE ${g.saved}/${g.cfg.rescue}`,244,21,'green',5,'center');
  if(g.stage===2)text(`ABOARD ${g.cargo}/${g.rescued}`,244,21,'green',5,'center');
  if(g.stage===0)text(`SENTRIES ${g.enemies.filter(e=>e.type==='turret'&&e.dead).length}/3`,244,21,'green',5,'center');
  if(g.stage===3)text('ARMOUR',215,21,'green',5,'center');
+ if(g.stage===4)text('FLEET ARMOUR',215,21,'green',5,'center');
+ if(g.stage===5)text(`SHIPS SUNK ${g.shipsDown}/${g.enemies.length}`,240,21,'green',5,'center');
  rect(0,262,W,8,'bg');text(MISSIONS[g.stage].special+` ${g.special>0?'RECHARGING':'[E]'}    FIRE [SPACE / CLICK]    PAUSE [P]`,8,268,'muted',5);
 }
 function draw(){
  ctx.imageSmoothingEnabled=false;
  if(!game){islandMap(menuTime);return;}
- if(game.stage===0)drawShore(game);if(game.stage===1)drawRescue(game);if(game.stage===2)drawFlight(game);if(game.stage===3)drawDuel(game);
+ if(game.stage===0)drawShore(game);if(game.stage===1)drawRescue(game);if(game.stage===2)drawFlight(game);if(game.stage===3)drawDuel(game);if(game.stage===4)drawSkyshield(game);if(game.stage===5)drawHorizon(game);
  ctx.save();if(game.stage===2)ctx.translate(-Math.round(game.camera),0);
  for(const s of game.shots){if(game.stage===3){line(s.x-4,s.y-1,s.x+4,s.y+1,s.team==='player'?'ink':'red',2);}else line(s.x,s.y,s.x-s.vx*.016,s.y-s.vy*.016,s.team==='player'?'gold':'red',game.stage===2?2:1);}
  for(const e of game.effects)rect(e.x,e.y,e.life>.25?2:1,2,e.color);ctx.restore();
- hud(game);if(game.status==='play'&&game.stage!==3){const p=mouse.active?mouse:game.stage===1?game.aim:null;if(p)cross(p.x,p.y);}
+ hud(game);if(game.status==='play'&&game.stage!==3&&game.stage!==5){const p=mouse.active?mouse:game.stage===1||game.stage===4?game.aim:null;if(p)cross(p.x,p.y);}
 }
 function selectedMode(){return document.querySelector('input[name="mode"]:checked').value;}
 function clearInput(){keys.clear();touchKeys.clear();if(mouse.pointerType==='touch')mouse.active=false;mouse.down=false;mouse.pointerId=null;mouse.pointerType=null;}
 function input(){const held=k=>keys.has(k)||[...touchKeys.values()].includes(k),left=held('KeyA')||held('ArrowLeft'),right=held('KeyD')||held('ArrowRight'),up=held('KeyW')||held('ArrowUp'),down=held('KeyS')||held('ArrowDown');return {dx:Number(right)-Number(left),dy:Number(down)-Number(up),jump:up,duck:down,fire:held('Space')||mouse.down,special:held('KeyE'),cover:held('ShiftLeft')||held('ShiftRight'),aim:mouse.active?{x:mouse.x,y:mouse.y}:null};}
 function modal(tag,title,body,primary='CONTINUE',secondary='OPERATIONS'){$('overlayTag').textContent=tag;$('overlayTitle').textContent=title;$('overlayText').textContent=body;$('overlayPrimary').textContent=primary;$('overlayPrimary').hidden=!primary;$('overlaySecondary').textContent=secondary;$('overlay').hidden=false;}
+function flightHint(g){const guide=g.flightGuide();if(!guide.pad)return 'All crew aboard. Return to the cyan carrier; you can land on its deck.';if(guide.direction===0)return 'Hold S / Down to land or hover low. Release horizontal movement for one second to board the crew.';return `Pickup pad ${guide.index} is ${guide.distance}m to your ${guide.direction<0?'left':'right'}. Follow the amber arrow, land or hover, then board the crew.`;}
 function syncStatus(){
- if(!game)return;const g=game,m=MISSIONS[g.stage];$('consoleTag').textContent=m.tag;$('consoleTitle').textContent=m.name;$('consoleText').textContent=m.text;$('missionHint').textContent=m.hint;$('keyHelp').innerHTML=m.keys;$('healthValue').textContent=`${g.hp} / ${g.cfg.hp}`;$('scoreValue').textContent=String(g.score).padStart(6,'0');$('livesValue').textContent=g.lives;$('touchSpecial').textContent=m.special;
+ if(!game)return;const g=game,m=MISSIONS[g.stage];$('consoleTag').textContent=m.tag;$('consoleTitle').textContent=m.name;$('consoleText').textContent=m.text;$('missionHint').textContent=g.stage===2?flightHint(g):m.hint;$('keyHelp').innerHTML=m.keys;$('healthValue').textContent=`${g.hp} / ${g.cfg.hp}`;$('scoreValue').textContent=String(g.score).padStart(6,'0');$('livesValue').textContent=g.lives;$('touchSpecial').textContent=m.special;
+ $('navalControls').hidden=g.stage!==5;if(g.stage===5){$('elevationDial').value=String(g.elevation);$('elevationReadout').textContent=`${g.elevation.toFixed(1)}° / ${Math.round(g.elevation*200)}m`;}
  let value=0,max=1,label='OBJECTIVE';if(g.stage===0){value=g.enemies.filter(e=>e.dead).length;max=4;label='GUNS SILENCED';}if(g.stage===1){value=g.saved;max=g.cfg.rescue;label='CREW SAFE';}if(g.stage===2){value=g.cargo;max=g.rescued;label='ABOARD';}if(g.stage===3){value=Math.max(0,g.boss.hp);max=g.boss.max;label='COMMANDER';}
+ if(g.stage===4){value=g.planesDown;max=g.raidTotal;label='AIRCRAFT DOWN';}if(g.stage===5){value=g.shipsDown;max=g.enemies.length;label='SHIPS SUNK';}
  $('goalLabel').textContent=label;$('goalValue').textContent=`${value} / ${max}`;$('progressValue').style.width=(g.stage===3?(1-value/max):value/max)*100+'%';
  $('pauseButton').disabled=!['play','paused'].includes(g.status);$('pauseButton').textContent=g.status==='paused'?'RESUME':'PAUSE';document.querySelectorAll('.mission-card').forEach((b,i)=>{b.classList.toggle('active',i===g.stage);b.disabled=true;});
  if(overlayState===g.status)return;overlayState=g.status;clearInput();
@@ -312,30 +449,33 @@ function syncStatus(){
  if(g.status==='paused')modal('TRANSMISSION ON HOLD','TAKE A BREATHER.','Your mission is paused. Resume when you’re ready.','RESUME →');
  if(g.status==='failed'){const retry=g.lives>0||g.mode==='easy';modal(`${g.mode.toUpperCase()} / ${g.lives} TRIES LEFT`,'MISSION INTERRUPTED',g.reason+(retry?'\nYour current stage is checkpointed.':g.practice?'\nRestart this practice mission with fresh tries.':'\nStart a fresh campaign for another run.'),retry?(g.lives>0?'RETRY STAGE →':'CONTINUE →'):g.practice?'RESTART PRACTICE →':'NEW CAMPAIGN →');}
  if(g.status==='clear')modal('OBJECTIVE COMPLETE','GOOD WORK, COMMANDER.',`+${500+g.hp*50} completion bonus\n${g.stage===1?g.saved+' crew members ready for extraction.':m.name+' complete.'}`,g.stage===3||g.practice?'DEBRIEF →':'NEXT MISSION →');
- if(g.status==='won'){if(!g.practice){bests=mergeBests(bests,{[g.mode]:g.score});try{bests=recordBest(bests,g.mode,g.score,localStorage);}catch(_){}}modal(g.practice?'PRACTICE COMPLETE':'OPERATION COMPLETE',g.practice?'DRILL COMPLETE.':'EVERY LAST LIGHT.',`${g.practice?'Mission':g.mode.toUpperCase()+' campaign'} complete · ${g.score} points\n${g.stage===3&&!g.practice?g.rescued+' crew extracted. ':''}Time ${Math.floor(g.elapsed/60)}:${String(Math.floor(g.elapsed%60)).padStart(2,'0')}\n${g.practice?'Ready for the full operation?':'The island is quiet. The crew is home.'}`,'PLAY AGAIN →');}
+ if(g.status==='won'){if(!g.practice){bests=mergeBests(bests,{[g.mode]:g.score});try{bests=recordBest(bests,g.mode,g.score,localStorage);}catch(_){}}modal(g.stage>=4?'BONUS COMPLETE':g.practice?'PRACTICE COMPLETE':'OPERATION COMPLETE',g.stage>=4?'FLEET SECURED.':g.practice?'DRILL COMPLETE.':'EVERY LAST LIGHT.',`${g.stage>=4?'Bonus operation':g.practice?'Mission':g.mode.toUpperCase()+' campaign'} complete · ${g.score} points\n${g.stage===3&&!g.practice?g.rescued+' crew extracted. ':''}Time ${Math.floor(g.elapsed/60)}:${String(Math.floor(g.elapsed%60)).padStart(2,'0')}\n${g.practice?'Ready for the full operation?':'The island is quiet. The crew is home.'}`,'PLAY AGAIN →');}
+ if(g.status==='won'&&!g.practice)$('overlaySecondary').textContent='BONUS OPERATIONS →';
  sound.paused=['paused','brief','won'].includes(g.status);sound.sync();
 }
-function showMenu(){game=null;overlayState='';clearInput();mouse.active=false;$('menuCopy').hidden=false;$('screenLabel').hidden=false;$('overlay').hidden=true;$('setupMode').hidden=false;$('setupStage').hidden=false;$('deployPanel').hidden=false;$('activePanel').hidden=true;$('returnButton').hidden=true;$('consoleTag').textContent='MISSION CONTROL';$('consoleTitle').textContent='Ready, commander?';$('consoleText').textContent='An island fortress. A stranded crew. You have until the last light.';$('pauseButton').disabled=true;$('pauseButton').textContent='PAUSE';$('deployButton').textContent=Number($('stageSelect').value)<0?'DEPLOY →':'PRACTICE →';canvas.classList.remove('playing');document.body.classList.remove('in-game');document.querySelectorAll('.mission-card').forEach(b=>{b.disabled=false;b.classList.toggle('active',Number(b.dataset.stage)===practiceStage);});sound.paused=false;sound.sync();updateBest();}
+function showMenu(){game=null;$('navalControls').hidden=true;overlayState='';clearInput();mouse.active=false;$('menuCopy').hidden=false;$('screenLabel').hidden=false;$('overlay').hidden=true;$('setupMode').hidden=false;$('setupStage').hidden=false;$('deployPanel').hidden=false;$('activePanel').hidden=true;$('returnButton').hidden=true;$('consoleTag').textContent='MISSION CONTROL';$('consoleTitle').textContent='Ready, commander?';$('consoleText').textContent='An island fortress. A stranded crew. You have until the last light.';$('pauseButton').disabled=true;$('pauseButton').textContent='PAUSE';$('deployButton').textContent=deployLabel();canvas.classList.remove('playing');document.body.classList.remove('in-game');document.querySelectorAll('.mission-card').forEach(b=>{b.disabled=false;b.classList.toggle('active',Number(b.dataset.stage)===practiceStage);});sound.paused=false;sound.sync();updateBest();}
+function deployLabel(){const stage=Number($('stageSelect').value);return stage<0?'DEPLOY →':stage>=4?'LAUNCH BONUS →':'PRACTICE →';}
 function updateBest(){const best=bests[selectedMode()];$('bestText').textContent=best?`CAMPAIGN BEST: ${best} POINTS`:'NO INSTALL. NO ACCOUNT. JUST PLAY.';}
 function deploy(){sound.unlock();const stage=Number($('stageSelect').value);practiceStage=stage;game=new Game(selectedMode(),Math.max(0,stage),stage>=0);overlayState='';mouse.active=false;clearInput();$('menuCopy').hidden=true;$('screenLabel').hidden=true;$('setupMode').hidden=true;$('setupStage').hidden=true;$('deployPanel').hidden=true;$('activePanel').hidden=false;$('returnButton').hidden=false;canvas.classList.add('playing');document.body.classList.add('in-game');syncStatus();canvas.focus({preventScroll:true});}
 function focusGame(){if(game?.status==='play')canvas.focus({preventScroll:true});}
 function pause(){if(!game)return;if(game.status==='play')game.status='paused';else if(game.status==='paused')game.status='play';syncStatus();focusGame();}
 function primaryAction(e){if(!game||e?.detail>1||performance.now()-lastPrimaryAction<300)return;lastPrimaryAction=performance.now();sound.unlock();if(game.status==='brief')game.begin();else if(game.status==='paused')game.status='play';else if(game.status==='failed'){if(!game.retry())deploy();}else if(game.status==='clear')game.advance();else if(game.status==='won'){deploy();}syncStatus();canvas.focus({preventScroll:true});}
-function updatePointer(e){if(e.pointerType==='touch'&&mouse.down&&mouse.pointerId!==e.pointerId)return;const r=canvas.getBoundingClientRect();mouse.x=clamp((e.clientX-r.left)/r.width*W,0,W);mouse.y=clamp((e.clientY-r.top)/r.height*H,0,H);mouse.active=e.pointerType!=='touch'||(game?.stage===1&&mouse.down&&mouse.pointerId===e.pointerId);}
+function updatePointer(e){if(e.pointerType==='touch'&&mouse.down&&mouse.pointerId!==e.pointerId)return;const r=canvas.getBoundingClientRect();mouse.x=clamp((e.clientX-r.left)/r.width*W,0,W);mouse.y=clamp((e.clientY-r.top)/r.height*H,0,H);mouse.active=e.pointerType!=='touch'||((game?.stage===1||game?.stage===4)&&mouse.down&&mouse.pointerId===e.pointerId);}
 function releasePointer(e){if(mouse.pointerId!==e.pointerId)return;if(mouse.pointerType==='touch')mouse.active=false;mouse.down=false;mouse.pointerId=null;mouse.pointerType=null;}
 canvas.addEventListener('pointermove',updatePointer);canvas.addEventListener('pointerdown',e=>{if(e.button!==0||mouse.down)return;e.preventDefault();sound.unlock();canvas.focus({preventScroll:true});if(game&&game.status==='play'){mouse.down=true;mouse.pointerId=e.pointerId;mouse.pointerType=e.pointerType;canvas.setPointerCapture(e.pointerId);}updatePointer(e);});
 for(const type of ['pointerup','pointercancel','lostpointercapture'])canvas.addEventListener(type,releasePointer);canvas.addEventListener('pointerleave',()=>{if(!mouse.down)mouse.active=false;});canvas.addEventListener('contextmenu',e=>e.preventDefault());
 const gameKeys=new Set(['KeyW','KeyA','KeyS','KeyD','ArrowUp','ArrowDown','ArrowLeft','ArrowRight','Space','KeyE','ShiftLeft','ShiftRight']);
-document.addEventListener('keydown',e=>{if(/INPUT|SELECT|TEXTAREA/.test(e.target.tagName))return;if(e.code==='KeyM'&&!e.repeat){toggleSound();return;}if(['KeyP','Escape'].includes(e.code)&&!e.repeat){e.preventDefault();pause();return;}if(e.target.tagName==='BUTTON')return;if(e.code==='Enter'&&!e.repeat&&(e.target===canvas||e.target===document.body)){e.preventDefault();if(game)primaryAction();else deploy();return;}if(game&&gameKeys.has(e.code)){e.preventDefault();keys.add(e.code);if(e.code.startsWith('Arrow')&&game.stage===1)mouse.active=false;if(e.code==='Space')sound.unlock();}});
+document.addEventListener('keydown',e=>{if(/INPUT|SELECT|TEXTAREA/.test(e.target.tagName))return;if(e.code==='KeyM'&&!e.repeat){toggleSound();return;}if(['KeyP','Escape'].includes(e.code)&&!e.repeat){e.preventDefault();pause();return;}if(e.target.tagName==='BUTTON')return;if(e.code==='Enter'&&!e.repeat&&(e.target===canvas||e.target===document.body)){e.preventDefault();if(game)primaryAction();else deploy();return;}if(game&&gameKeys.has(e.code)){e.preventDefault();keys.add(e.code);if(((e.code.startsWith('Arrow')||['KeyW','KeyA','KeyS','KeyD'].includes(e.code))&&(game.stage===1||game.stage===4))||(game.stage===5&&['KeyA','KeyD','ArrowLeft','ArrowRight'].includes(e.code)))mouse.active=false;if(e.code==='Space')sound.unlock();}});
 document.addEventListener('keyup',e=>{keys.delete(e.code);});window.addEventListener('blur',()=>{clearInput();if(game&&game.status==='play'){game.status='paused';syncStatus();}});document.addEventListener('visibilitychange',()=>{if(document.hidden){clearInput();if(game&&game.status==='play'){game.status='paused';syncStatus();}}last=0;accumulator=0;});
 for(const button of document.querySelectorAll('[data-key]')){button.addEventListener('pointerdown',e=>{e.preventDefault();sound.unlock();touchKeys.set(e.pointerId,button.dataset.key);button.setPointerCapture(e.pointerId);mouse.active=false;});for(const type of ['pointerup','pointercancel','lostpointercapture'])button.addEventListener(type,e=>touchKeys.delete(e.pointerId));}
 function toggleSound(){sound.on=!sound.on;sound.unlock();$('soundButton').textContent=sound.on?'SOUND ON':'SOUND OFF';$('soundButton').setAttribute('aria-pressed',String(sound.on));sound.sync();focusGame();}
-$('deployButton').addEventListener('click',deploy);$('overlayPrimary').addEventListener('click',primaryAction);$('overlaySecondary').addEventListener('click',showMenu);$('pauseButton').addEventListener('click',pause);$('returnButton').addEventListener('click',()=>{if(game?.status==='play'){game.status='paused';syncStatus();modal('RETURN TO OPERATIONS?','LEAVE THIS RUN?','Your current run will end. You can practice any stage from Operations.','RESUME →','LEAVE RUN');}else showMenu();});$('soundButton').addEventListener('click',toggleSound);
+$('deployButton').addEventListener('click',deploy);$('overlayPrimary').addEventListener('click',primaryAction);$('overlaySecondary').addEventListener('click',()=>{const bonus=game?.status==='won'&&!game.practice;showMenu();if(bonus){practiceStage=4;$('stageSelect').value='4';$('deployButton').textContent=deployLabel();document.querySelectorAll('.mission-card').forEach(b=>b.classList.toggle('active',Number(b.dataset.stage)===4));}});$('pauseButton').addEventListener('click',pause);$('returnButton').addEventListener('click',()=>{if(game?.status==='play'){game.status='paused';syncStatus();modal('RETURN TO OPERATIONS?','LEAVE THIS RUN?','Your current run will end. You can practice any stage from Operations.','RESUME →','LEAVE RUN');}else showMenu();});$('soundButton').addEventListener('click',toggleSound);
 $('mathToggle').addEventListener('change',e=>{sound.math=e.target.checked;sound.unlock();sound.sync();focusGame();});$('voiceToggle').addEventListener('change',e=>{sound.voices=e.target.checked;sound.unlock();focusGame();});
+$('elevationDial').addEventListener('input',e=>{if(game?.stage===5)game.elevation=clamp(Number(e.target.value),5,50);});$('elevationDial').addEventListener('pointerup',focusGame);
 $('fullButton').addEventListener('click',()=>{if(document.fullscreenElement){document.exitFullscreen?.().catch(()=>{});}else document.documentElement.requestFullscreen?.().catch(()=>{});focusGame();});document.addEventListener('fullscreenchange',focusGame);
 for(const radio of document.querySelectorAll('input[name="mode"]'))radio.addEventListener('change',()=>{$('modeNote').textContent=selectedMode()==='easy'?'More armour. Slower fire. Stage checkpoints and unlimited continues.':'Less armour. Faster enemies. Three tries for the whole campaign.';updateBest();});
-$('stageSelect').addEventListener('change',()=>{practiceStage=Number($('stageSelect').value);$('deployButton').textContent=practiceStage<0?'DEPLOY →':'PRACTICE →';document.querySelectorAll('.mission-card').forEach(b=>b.classList.toggle('active',Number(b.dataset.stage)===practiceStage));});
-document.querySelectorAll('.mission-card').forEach(b=>b.addEventListener('click',()=>{if(game)return;practiceStage=Number(b.dataset.stage);$('stageSelect').value=String(practiceStage);document.querySelectorAll('.mission-card').forEach(c=>c.classList.toggle('active',b===c));$('deployButton').textContent='PRACTICE →';}));
+$('stageSelect').addEventListener('change',()=>{practiceStage=Number($('stageSelect').value);$('deployButton').textContent=deployLabel();document.querySelectorAll('.mission-card').forEach(b=>b.classList.toggle('active',Number(b.dataset.stage)===practiceStage));});
+document.querySelectorAll('.mission-card').forEach(b=>b.addEventListener('click',()=>{if(game)return;practiceStage=Number(b.dataset.stage);$('stageSelect').value=String(practiceStage);document.querySelectorAll('.mission-card').forEach(c=>c.classList.toggle('active',b===c));$('deployButton').textContent=deployLabel();}));
 let touchVisible=window.matchMedia('(pointer: coarse)').matches;function toggleTouch(){touchVisible=!touchVisible;$('touchPad').hidden=!touchVisible;$('touchButton').setAttribute('aria-pressed',String(touchVisible));clearInput();focusGame();}$('touchPad').hidden=!touchVisible;$('touchButton').setAttribute('aria-pressed',String(touchVisible));$('touchButton').addEventListener('click',toggleTouch);
 window.addEventListener('storage',e=>{if(e.key==='landfall64-best'){try{bests=mergeBests(bests,JSON.parse(e.newValue));updateBest();}catch(_){}}});
 function frame(stamp){const delta=last?Math.min((stamp-last)/1000,.08):0;last=stamp;menuTime+=reduced?0:delta;accumulator+=delta;if(game&&game.status==='play'){while(accumulator>=DT&&game.status==='play'){game.update(DT,input());accumulator-=DT;}for(const e of game.events)sound.event(e);game.events=[];}else accumulator=0;uiTime+=delta;if(uiTime>.08||game&&overlayState!==game.status){uiTime=0;syncStatus();}draw();requestAnimationFrame(frame);}
