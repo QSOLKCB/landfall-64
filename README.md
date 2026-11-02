@@ -6,6 +6,15 @@ An original C64-style arcade campaign in one HTML file: Canvas, vanilla JavaScri
 
 **[Play on GitHub Pages](https://qsolkcb.github.io/landfall-64/)** · [Source](index.html)
 
+## Current build — v1.2.0
+
+This build polishes controls, collision physics and combat graphics across the four campaign missions and two standalone bonuses.
+
+- **Reliable inputs:** short mouse, keyboard and touch taps reach the next simulation step. Cancelled touches and loss of focus clear pending actions. Ducking no longer consumes a ready throw.
+- **Better collisions:** shots resolve the first contact along their path, and vehicle hit areas include their visible turrets. Squad and helicopter movement stop at solid surfaces and slide along them; descending onto a rock no longer pushes the helicopter sideways.
+- **Clearer combat:** aimed weapons, gun recoil, muzzle and enemy hit flashes, brighter tracers, tumbling darts and walking tied to actual movement. Reduced-motion mode suppresses the new flashes, recoil and dart spin. Naval splash reports stay visible through the next launch.
+- **Verified and lean:** 67 automated checks pass, including completion controllers for the Easy campaign missions and both bonuses on Easy and Hard. The playable HTML is 83,757 bytes, with no dependencies or runtime downloads.
+
 ## Play locally
 
 Download this repository and open `index.html` in a modern desktop browser. The game works directly from `file://`; nothing needs to be installed. Click **Deploy**, read the briefing, then click **Go**. Sound starts after a click or key press.
@@ -56,7 +65,7 @@ The bonus mechanics reference the anti-aircraft and ranging-gun sequences in the
 | `M` | Toggle all sound. Math pulse and voices have independent toggles. |
 | `Enter` | Deploy / start / continue when the game canvas has focus. |
 
-For keyboard-only shooting, keep the pointer away from the canvas: assault and flight select a nearby enemy automatically, and the duel targets the commander. Rescue uses the arrow keys or WASD to move the reticle. Touch controls appear on coarse-pointer devices and can also be enabled with the footer button. In rescue, tap/hold the canvas to aim and fire; in other stages touch firing uses the same automatic aim.
+For keyboard-only shooting, keep the pointer away from the canvas: assault and flight select a nearby enemy automatically, and the duel targets the commander. Rescue and Skyshield use the arrow keys or WASD to move the reticle. Touch controls appear on coarse-pointer devices and can also be enabled with the footer button. In rescue and both naval bonuses, tap or drag the canvas to aim and fire; Iron Horizon sets bearing and range together when you aim at a visible hull or mast. In assault, flight and the duel, touch firing uses automatic aim.
 
 ## Difficulty
 
@@ -69,7 +78,7 @@ For keyboard-only shooting, keep the pointer away from the canvas: assault and f
 | Commander armour | 10 | 16 |
 | Special recharge | 7 seconds | 10 seconds |
 
-Both modes checkpoint at stage entry. Retrying restores that stage's starting score and crew, preventing score farming. Hard ends after the third failure; Easy can continue the current stage indefinitely. Weapons have unlimited ammunition. There are no timers forcing you to rush.
+Both modes checkpoint at stage entry. Retrying restores that stage's starting score and crew, preventing score farming. Hard ends after the third failure; Easy can continue the current stage indefinitely. Ammunition is unlimited; Skyshield has six ready shells that replenish automatically. There are no timers forcing you to rush.
 
 ## Small by design
 
